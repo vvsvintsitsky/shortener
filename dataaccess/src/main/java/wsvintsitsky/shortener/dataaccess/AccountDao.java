@@ -17,4 +17,6 @@ public interface AccountDao {
 	void deleteAll();
 	
 	void update(Account account);
+	
+	List<Account> findByCriteria();
 }

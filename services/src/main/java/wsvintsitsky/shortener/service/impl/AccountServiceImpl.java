@@ -48,4 +48,9 @@ public class AccountServiceImpl implements AccountService {
 	public void deleteAll() {
 		accountDao.deleteAll();
 	}
+
+	@Override
+	public List<Account> findByCriteria() {
+		return accountDao.findByCriteria();
+	}
 }

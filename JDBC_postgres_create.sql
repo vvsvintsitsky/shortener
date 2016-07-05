@@ -15,6 +15,7 @@ CREATE TABLE "url" (
 	"long_url" character varying(255) NOT NULL,
 	"description" character varying(255) NOT NULL,
 	"visited" int NOT NULL,
+	"account_id" int NOT NULL,
 	CONSTRAINT url_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -42,6 +43,7 @@ CREATE TABLE "url_2_tag" (
 
 
 
+ALTER TABLE "url" ADD CONSTRAINT "url_fk0" FOREIGN KEY ("account_id") REFERENCES "account"("id");
 
 
 ALTER TABLE "url_2_tag" ADD CONSTRAINT "url_2_tag_fk0" FOREIGN KEY ("url_id") REFERENCES "url"("id");

@@ -16,4 +16,6 @@ public interface AccountService {
 	
 	void deleteAll();
 	
+	List<Account> findByCriteria();
+	
 }

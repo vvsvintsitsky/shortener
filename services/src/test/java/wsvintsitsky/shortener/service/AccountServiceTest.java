@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 import wsvintsitsky.shortener.datamodel.Account;
+import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.AccountService;
 
 @SuppressWarnings("unused")
@@ -18,11 +19,15 @@ import wsvintsitsky.shortener.service.AccountService;
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class AccountServiceTest {
 
-	@Inject private AccountService accountService;
+	@Inject
+	private UrlService urlService;
+	
+	@Inject
+	private AccountService accountService;
 	
 	@Test
 	public void testInsert() {		
-		accountService.deleteAll();
+		wipeDB();
 
 		Account account = new Account();
 		account.setEmail("Vlad");
@@ -32,7 +37,7 @@ public class AccountServiceTest {
 	
 	@Test
 	public void testUpdate() {
-		accountService.deleteAll();
+		wipeDB();
 		
 		Account account = new Account();
 		account.setEmail("Vlad");
@@ -46,7 +51,7 @@ public class AccountServiceTest {
 	
 	@Test
 	public void testDelete() {
-		accountService.deleteAll();
+		wipeDB();
 		
 		Account account = new Account();
 		account.setEmail("Vlad");
@@ -54,5 +59,23 @@ public class AccountServiceTest {
 		
 		accountService.delete(account.getId());
 		
+	}
+	
+	@Test
+	public void testFindByCriteria() {
+		List<Account> accounts = accountService.findByCriteria();
+		
+		for(Account account : accounts) {
+			System.out.println(account);
+			for(Url url : account.getUrls()) {
+				System.out.println(url);
+			}
+		}
+		
+	}
+	
+	private void wipeDB() {
+		urlService.deleteAll();
+		accountService.deleteAll();
 	}
 }

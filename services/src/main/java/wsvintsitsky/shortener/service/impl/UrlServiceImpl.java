@@ -50,4 +50,9 @@ public class UrlServiceImpl implements UrlService {
 		urlDao.deleteAll();
 	}
 
+	@Override
+	public List<Url> findByCriteria() {
+		return urlDao.findByCriteria();
+	}
+
 }

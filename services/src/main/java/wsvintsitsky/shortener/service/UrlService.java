@@ -15,4 +15,6 @@ void saveOrUpdate(Url url);
 	void delete(Long id);
 	
 	void deleteAll();
+	
+	List<Url> findByCriteria();
 }

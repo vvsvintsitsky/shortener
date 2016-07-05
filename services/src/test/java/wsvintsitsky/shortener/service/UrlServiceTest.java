@@ -1,5 +1,7 @@
 package wsvintsitsky.shortener.service;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -7,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Url;
 
 @SuppressWarnings("unused")
@@ -17,14 +20,24 @@ public class UrlServiceTest {
 	@Inject
 	private UrlService urlService;
 	
+	@Inject
+	private AccountService accountService;
+	
 	@Test
 	public void testInsert() {
-		urlService.deleteAll();
+//		wipeDB();
+//		
+//		Account account = new Account();
+//		account.setEmail("vvs@gmail.com");
+//		account.setPassword("password");
+//		accountService.saveOrUpdate(account);
+		Account account = accountService.get(3L);
 		
 		Url url = new Url();
-		url.setLongUrl("long");
+		url.setLongUrl("thr");
 		url.setVisited(0L);
 		url.setDescription("description");
+		url.setAccount(account);
 		
 		urlService.saveOrUpdate(url);
 		System.out.println(url);
@@ -36,7 +49,7 @@ public class UrlServiceTest {
 	
 	@Test
 	public void testUpdate() {
-		urlService.deleteAll();
+		wipeDB();
 		
 		Url url = new Url();
 		url.setLongUrl("long");
@@ -54,7 +67,7 @@ public class UrlServiceTest {
 	
 	@Test
 	public void testDelete() {
-		urlService.deleteAll();
+		wipeDB();
 		
 		Url url = new Url();
 		url.setLongUrl("long");
@@ -64,5 +77,19 @@ public class UrlServiceTest {
 		
 		urlService.delete(url.getId());
 		
+	}
+	
+	@Test
+	public void testFindByCriteria() {
+		List<Url> urls = urlService.findByCriteria();
+		
+		for(Url url : urls) {
+			System.out.println(url);
+		}
+	}
+	
+	private void wipeDB() {
+		urlService.deleteAll();
+		accountService.deleteAll();
 	}
 }

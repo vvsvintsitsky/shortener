@@ -17,4 +17,6 @@ public interface UrlDao {
 	void deleteAll();
 	
 	void update(Url url);
+	
+	List<Url> findByCriteria();
 }
