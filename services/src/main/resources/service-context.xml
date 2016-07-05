@@ -26,11 +26,15 @@
 		p:url="jdbc:postgresql://localhost:5432/hotel" p:username="postgres"
 		p:password="7muCC" p:schema="public" />
 
-<!--  
-	<bean id="jdbcTemplate"
-		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
-		<constructor-arg ref="dataSource" />
-	</bean>  -->
+	<tx:annotation-driven />
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- <bean id="jdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate"> 
+		<constructor-arg ref="dataSource" /> </bean> -->
 
 	<tx:annotation-driven />
 

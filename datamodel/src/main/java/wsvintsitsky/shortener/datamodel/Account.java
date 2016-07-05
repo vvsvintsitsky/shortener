@@ -5,13 +5,6 @@ import java.io.Serializable;
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	public Account(Long id, String name, String password) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.password = password;
-	}
 	
 	private Long id;
 	
