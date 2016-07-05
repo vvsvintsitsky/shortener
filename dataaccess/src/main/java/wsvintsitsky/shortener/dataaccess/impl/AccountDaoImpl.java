@@ -29,15 +29,15 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 	}
 
 	@Override
-	public void insertAccount(Account account) {
+	public void insert(Account account) {
 
-		String INSERT_SQL = "INSERT INTO account (name, password) VALUES (?, ?)";
+		String INSERT_SQL = "INSERT INTO account (email, password) VALUES (?, ?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		getJdbcTemplate().update(new PreparedStatementCreator() {
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "id" });
-				ps.setString(1, account.getName());
+				ps.setString(1, account.getEmail());
 				ps.setString(2, account.getPassword());
 				return ps;
 			}
@@ -82,10 +82,10 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 	@Override
 	public void update(Account account) {
 
-		String UPDATE_SQL = "UPDATE account SET name = ?, password = ? WHERE id = ?";
+		String UPDATE_SQL = "UPDATE account SET email = ?, password = ? WHERE id = ?";
 
 		getJdbcTemplate().update(UPDATE_SQL,
-				new Object[] { account.getName(), account.getPassword(), account.getId() });
+				new Object[] { account.getEmail(), account.getPassword(), account.getId() });
 	}
 
 	private class AccountMapper implements RowMapper<Account> {
@@ -94,7 +94,7 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 		public Account mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Account account = new Account();
 			account.setId(rs.getLong("id"));
-			account.setName(rs.getString("name"));
+			account.setEmail(rs.getString("email"));
 			account.setPassword(rs.getString("password"));
 			return account;
 		}

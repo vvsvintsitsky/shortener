@@ -14,16 +14,17 @@ import wsvintsitsky.shortener.service.AccountService;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-	@Inject private AccountDao accountDao;
+	@Inject
+	private AccountDao accountDao;
 
 	@Override
 	@Transactional
 	public void saveOrUpdate(Account account) {
-		if(account.getId() == null) {
-			accountDao.insertAccount(account);
+		if (account.getId() == null) {
+			accountDao.insert(account);
 		} else {
 			accountDao.update(account);
-		}	
+		}
 	}
 
 	@Override
@@ -45,6 +46,6 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional
 	public void deleteAll() {
-		accountDao.deleteAll();	
+		accountDao.deleteAll();
 	}
 }

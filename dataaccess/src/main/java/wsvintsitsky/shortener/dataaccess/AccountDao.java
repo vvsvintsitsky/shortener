@@ -6,7 +6,7 @@ import wsvintsitsky.shortener.datamodel.Account;
 
 public interface AccountDao {
 
-	void insertAccount(Account account);
+	void insert(Account account);
 	
 	Account get(Long id);
 	

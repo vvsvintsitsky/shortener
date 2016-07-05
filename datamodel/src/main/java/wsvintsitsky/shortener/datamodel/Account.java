@@ -1,31 +1,19 @@
 package wsvintsitsky.shortener.datamodel;
 
-import java.io.Serializable;
-
-public class Account implements Serializable {
+public class Account extends AbstractModel{
 
 	private static final long serialVersionUID = 1L;
-	
-	private Long id;
-	
-	private String name;
+
+	private String email;
 	
 	private String password;
 
-	public Long getId() {
-		return id;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setEmail(String name) {
+		this.email = name;
 	}
 
 	public String getPassword() {
@@ -38,7 +26,7 @@ public class Account implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Account [id=" + id + ", name=" + name + ", password=" + password + "]";
+		return "Account [id=" + getId() + ", name=" + email + ", password=" + password + "]";
 	}
 	
 }
