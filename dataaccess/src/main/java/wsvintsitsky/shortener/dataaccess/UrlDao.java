@@ -7,6 +7,10 @@ import wsvintsitsky.shortener.datamodel.Url;
 public interface UrlDao {
 
 	void insert(Url url);
+
+	void insertUrl2Tag(Url url);
+	
+	void deleteUrl2Tag(Long id);
 	
 	Url get(Long id);
 	
@@ -19,4 +23,9 @@ public interface UrlDao {
 	void update(Url url);
 	
 	List<Url> findByCriteria();
+	
+	List<Url> getUrlsWithTags();
+	
+	List<Url> getUrlsOnTagId(Long id);
+
 }

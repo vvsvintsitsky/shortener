@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import wsvintsitsky.shortener.datamodel.Account;
+import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 
 @SuppressWarnings("unused")
@@ -23,6 +24,9 @@ public class UrlServiceTest {
 	@Inject
 	private AccountService accountService;
 	
+	@Inject
+	private TagService tagService;
+	
 	@Test
 	public void testInsert() {
 //		wipeDB();
@@ -31,7 +35,7 @@ public class UrlServiceTest {
 //		account.setEmail("vvs@gmail.com");
 //		account.setPassword("password");
 //		accountService.saveOrUpdate(account);
-		Account account = accountService.get(3L);
+		Account account = accountService.get(1L);
 		
 		Url url = new Url();
 		url.setLongUrl("thr");
@@ -88,8 +92,40 @@ public class UrlServiceTest {
 		}
 	}
 	
+	@Test
+	public void testGetUrlsWithTags() {
+		List<Url> urls = urlService.getUrlsWithTags();
+		
+		for(Url url : urls) {
+			System.out.println(url);
+			for(Tag tag : url.getTags()) {
+				System.out.println(tag);
+			}
+			System.out.println();
+		}
+	}
+	
+	@Test
+	public void testGetUrlsOnTagId() {
+		List<Url> urls = urlService.getUrlsOnTagId(2L);
+		
+		for(Url url : urls) {
+			System.out.println(url);
+		}
+	}
+	
+	@Test
+	public void testInsertUrl2Tag() {
+		Url url = urlService.get(1L);
+		Tag tag = tagService.get(1L);
+		url.getTags().add(tag);
+		urlService.saveOrUpdate(url);
+		
+	}
+	
 	private void wipeDB() {
 		urlService.deleteAll();
+		tagService.deleteAll();
 		accountService.deleteAll();
 	}
 }

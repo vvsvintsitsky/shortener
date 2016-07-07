@@ -17,4 +17,8 @@ void saveOrUpdate(Url url);
 	void deleteAll();
 	
 	List<Url> findByCriteria();
+	
+	List<Url> getUrlsWithTags();
+	
+	List<Url> getUrlsOnTagId(Long id);
 }

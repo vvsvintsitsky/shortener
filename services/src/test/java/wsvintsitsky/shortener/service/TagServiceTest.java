@@ -15,11 +15,17 @@ import wsvintsitsky.shortener.datamodel.Tag;
 public class TagServiceTest {
 
 	@Inject
+	private UrlService urlService;
+	
+	@Inject
+	private AccountService accountService;
+	
+	@Inject
 	private TagService tagService;
 	
 	@Test
 	public void testInsert() {
-		tagService.deleteAll();
+		wipeDB();
 		
 		Tag tag = new Tag();
 		tag.setDescription("testTag");
@@ -32,7 +38,7 @@ public class TagServiceTest {
 	
 	@Test
 	public void testUpdate() {
-		tagService.deleteAll();
+		wipeDB();
 		
 		Tag tag = new Tag();
 		tag.setDescription("testTag");
@@ -46,12 +52,18 @@ public class TagServiceTest {
 	
 	@Test
 	public void testDelete() {
-		tagService.deleteAll();
+		wipeDB();
 		
 		Tag tag = new Tag();
 		
 		
 		tagService.delete(tag.getId());
 		
+	}
+	
+	private void wipeDB() {
+		urlService.deleteAll();
+		tagService.deleteAll();
+		accountService.deleteAll();
 	}
 }

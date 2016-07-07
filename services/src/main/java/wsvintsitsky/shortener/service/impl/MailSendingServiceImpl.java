@@ -21,13 +21,6 @@ public class MailSendingServiceImpl implements MailSendingService {
 //	}
 //
 //	@Override
-//	public void sendApprovedEmail(Bill bill, String from, String to, String userId, String password,
-//			String messageSubject, String messageText) {
-//		MailSender mailSender = new MailSender(bill, from, to, userId, password, messageSubject, messageText);
-//		mailSender.start();
-//	}
-//
-//	@Override
 //	public void sendForgottenEmails(String from, String userId, String password) {
 //		MailSender mailSender = new MailSender(from, userId, password);
 //		mailSender.start();
@@ -41,25 +34,12 @@ public class MailSendingServiceImpl implements MailSendingService {
 //		private String password;
 //		private String messageSubject;
 //		private String messageText;
-//		private Bill bill;
-//		private UserCredentials userCredentials;
+//		private Account account;
 //
-//		public MailSender(Bill bill, String from, String to, String userId, String password, String messageSubject,
-//				String messageText) {
-//
-//			this.bill = bill;
-//			this.from = from;
-//			this.to = to;
-//			this.userId = userId;
-//			this.password = password;
-//			this.messageSubject = messageSubject;
-//			this.messageText = messageText;
-//		}
-//
-//		public MailSender(UserCredentials userCredentials, String from, String to, String userId, String password,
+//		public MailSender(Account account, String from, String to, String userId, String password,
 //				String messageSubject, String messageText) {
 //
-//			this.userCredentials = userCredentials;
+//			this.account = account;
 //			this.from = from;
 //			this.to = to;
 //			this.userId = userId;
@@ -84,27 +64,11 @@ public class MailSendingServiceImpl implements MailSendingService {
 //			try {
 //				MimeMessage message = setupMimeMessage(session);
 //				Transport.send(message);
-//				userCredentials.setNotified(true);
+//				account.setNotified(true);
 //			} catch (MessagingException mex) {
-//				userCredentials.setNotified(false);
+//				account.setNotified(false);
 //			}
-//			userService.update(userCredentials);
-//		}
-//
-//		public void sendApprovedMail() {
-//
-//			Properties properties = setupProperties();
-//			Authenticator authenticator = setupAuthenticator();
-//			Session session = Session.getDefaultInstance(properties, authenticator);
-//
-//			try {
-//				MimeMessage message = setupMimeMessage(session);
-//				Transport.send(message);
-//				bill.setNotified(true);
-//			} catch (MessagingException mex) {
-//				bill.setNotified(false);
-//			}
-//			billService.update(bill);
+//			accountService.update(account);
 //		}
 //
 //		private MimeMessage setupMimeMessage(Session session) throws MessagingException, AddressException {
@@ -159,24 +123,6 @@ public class MailSendingServiceImpl implements MailSendingService {
 //						"To activate your account click this link: ", approveLink);
 //				MailSender mailSender = new MailSender(userCredentials, from, userCredentials.getEmail(), userId,
 //						password, messageSubject, messageText);
-//				mailSender.start();
-//			}
-//		}
-//
-//		private void sendForgottenBills() {
-//			BillFilter billFilter = new BillFilter();
-//			billFilter.setIsNotified(false);
-//			billFilter.setFetchUserCredentials(true);
-//			List<Bill> bills = billService.findByCriteria(billFilter);
-//			String messageSubject = "Your ticket has been approved";
-//
-//			for (Bill bill : bills) {
-//				UserProfile profile = bill.getTicket().getUserProfile();
-//				UserCredentials to = profile.getCredentials();
-//				String messageText = String.format("%s %s, %s", profile.getFirstName(), profile.getLastName(),
-//						messageSubject);
-//				MailSender mailSender = new MailSender(bill, from, to.getEmail(), userId, password, messageSubject,
-//						messageText);
 //				mailSender.start();
 //			}
 //		}

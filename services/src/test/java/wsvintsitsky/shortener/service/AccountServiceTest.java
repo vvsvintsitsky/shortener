@@ -25,6 +25,9 @@ public class AccountServiceTest {
 	@Inject
 	private AccountService accountService;
 	
+	@Inject
+	private TagService tagService;
+	
 	@Test
 	public void testInsert() {		
 		wipeDB();
@@ -32,6 +35,7 @@ public class AccountServiceTest {
 		Account account = new Account();
 		account.setEmail("Vlad");
 		account.setPassword("pass");
+		
 		accountService.saveOrUpdate(account);
 	}
 	
@@ -76,6 +80,7 @@ public class AccountServiceTest {
 	
 	private void wipeDB() {
 		urlService.deleteAll();
+		tagService.deleteAll();
 		accountService.deleteAll();
 	}
 }
