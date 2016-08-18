@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,18 @@ import wsvintsitsky.shortener.datamodel.Url;
 @Repository
 public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 
+	private final static String INSERT_URL = "INSERT INTO url (short_url, long_url, description, visited, account_id) VALUES (?, ?, ?, ?, ?)";
+	private final static String INSERT_URL2TAG = "INSERT INTO url_2_tag (url_id, tag_id) VALUES (?, ?)";
+	private final static String DELETE_URL2TAG = "DELETE FROM url_2_tag WHERE url_id = ?";
+	private final static String SELECT_URL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1, url.account_id as account_id1 FROM url WHERE id = ?";
+	private final static String SELECT_ALLURL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1 url.account_id as account_id1 FROM url ORDER BY id";
+	private final static String DELETE_URL = "DELETE FROM url WHERE id = ?";
+	private final static String DELETE_ALLURL = "DELETE FROM url";
+	private final static String DELETE_ALLURL2TAG = "DELETE FROM url_2_tag";
+	private final static String UPDATE_URL = "UPDATE url SET short_url = ?, long_url = ?, description = ?, visited = ?, account_id = ?  WHERE id = ?";
+	private final static String SELECT_URLSWITHTAGS = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1, tag.id AS id2, tag.description AS description2 FROM url LEFT JOIN url_2_tag on url.id = url_2_tag.url_id LEFT JOIN tag on url_2_tag.tag_id = tag.id";
+	private final static String SELECT_URLSONTAGID = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1 FROM url LEFT JOIN url_2_tag on url.id = url_2_tag.url_id WHERE url_2_tag.tag_id = ?";
+
 	@Autowired
 	public UrlDaoImpl(DataSource dataSource) {
 		setDataSource(dataSource);
@@ -37,14 +50,11 @@ public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 
 	@Override
 	public void insert(Url url) {
-
-		String INSERT_SQL = "INSERT INTO url (short_url, long_url, description, visited, account_id) VALUES (?, ?, ?, ?, ?)";
-
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		getJdbcTemplate().update(new PreparedStatementCreator() {
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "id" });
+				PreparedStatement ps = connection.prepareStatement(INSERT_URL, new String[] { "id" });
 				ps.setString(1, url.getShortUrl());
 				ps.setString(2, url.getLongUrl());
 				ps.setString(3, url.getDescription());
@@ -58,87 +68,69 @@ public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 
 	@Override
 	public void insertUrl2Tag(Url url) {
-		String INSERT_SQL = "INSERT INTO url_2_tag (url_id, tag_id) VALUES (?, ?)";
-		getJdbcTemplate().batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
-			
+		getJdbcTemplate().batchUpdate(INSERT_URL2TAG, new BatchPreparedStatementSetter() {
+
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				Tag tag = url.getTags().get(i);
 				ps.setLong(1, url.getId());
 				ps.setLong(2, tag.getId());
 			}
-					
+
 			@Override
 			public int getBatchSize() {
 				return url.getTags().size();
 			}
-		  });
+		});
+	}
+
+	@Override
+	public void deleteUrl2Tag(Long id) {
+		getJdbcTemplate().update(DELETE_URL2TAG, new Object[] { id });
 	}
 	
 	@Override
-	public void deleteUrl2Tag(Long id) {
-		String DELETE_SQL = "DELETE FROM url_2_tag WHERE url_id = ?";
-		getJdbcTemplate().update(DELETE_SQL, new Object[] { id });
-	}
-
-	@Override
 	public Url get(Long id) {
-		String SELECT_SQL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1, url.account_id as account_id1 FROM url WHERE id = ?";
-
-		Url url = getJdbcTemplate().queryForObject(SELECT_SQL, new Object[] { id }, new UrlMapper());
+		Url url = getJdbcTemplate().queryForObject(SELECT_URL, new Object[] { id }, new UrlMapper());
 		return url;
 	}
 
 	@Override
 	public List<Url> getAll() {
-		String SELECT_SQL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1 url.account_id as account_id1 FROM url ORDER BY id";
-
-		List<Url> urls = getJdbcTemplate().query(SELECT_SQL, new UrlMapper());
+		List<Url> urls = getJdbcTemplate().query(SELECT_ALLURL, new UrlMapper());
 		return urls;
 	}
 
 	@Override
 	public void delete(Long id) {
-		String DELETE_SQL = "DELETE FROM url WHERE id = ?";
-
-		getJdbcTemplate().update(DELETE_SQL, new Object[] { id });
+		getJdbcTemplate().update(DELETE_URL, new Object[] { id });
 	}
 
 	@Override
 	public void deleteAll() {
-		String DELETE_SQL = "DELETE FROM url";
-
-		getJdbcTemplate().update(DELETE_SQL);
+		getJdbcTemplate().update(DELETE_ALLURL);
+	}
+	
+	@Override
+	public void deleteAllUrl2Tag() {
+		getJdbcTemplate().update(DELETE_ALLURL2TAG);
 	}
 
 	@Override
 	public void update(Url url) {
-		String UPDATE_SQL = "UPDATE url SET short_url = ?, long_url = ?, description = ?, visited = ?, account_id = ?  WHERE id = ?";
-
-		getJdbcTemplate().update(UPDATE_SQL, new Object[] { url.getShortUrl(), url.getLongUrl(), url.getDescription(),
+		getJdbcTemplate().update(UPDATE_URL, new Object[] { url.getShortUrl(), url.getLongUrl(), url.getDescription(),
 				url.getVisited(), url.getAccount().getId(), url.getId() });
 	}
 
 	@Override
-	public List<Url> findByCriteria() {
-		String SELECT_SQL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1, account.id AS id2, account.email AS email2, account.password as password2 FROM url LEFT OUTER JOIN account on url.account_id = account.id";
-
-		List<Url> urls = getJdbcTemplate().query(SELECT_SQL, new UrlAccountFetchingMapper());
-		return urls;
-	}
-	
-	@Override
 	public List<Url> getUrlsWithTags() {
-		String SELECT_SQL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1, tag.id AS id2, tag.description AS description2 FROM url LEFT JOIN url_2_tag on url.id = url_2_tag.url_id LEFT JOIN tag on url_2_tag.tag_id = tag.id";
-		List<Url> urls = (List<Url>) getJdbcTemplate().query(SELECT_SQL, new UrlWithTagsExtractor());
+		List<Url> urls = (List<Url>) getJdbcTemplate().query(SELECT_URLSWITHTAGS, new UrlWithTagsExtractor());
 		return urls;
 	}
-	
+
 	@Override
 	public List<Url> getUrlsOnTagId(Long id) {
-		String SELECT_SQL = "SELECT url.id AS id1, url.short_url AS short_url1, url.long_url AS long_url1, url.description AS description1, url.visited AS visited1 FROM url LEFT JOIN url_2_tag on url.id = url_2_tag.url_id WHERE url_2_tag.tag_id = ?";
-		List<Url> urls = (List<Url>) getJdbcTemplate().query(SELECT_SQL, new Object[] { id }, new UrlMapper());
-
+		List<Url> urls = (List<Url>) getJdbcTemplate().query(SELECT_URLSONTAGID, new Object[] { id }, new UrlMapper());
 		return urls;
 	}
 
@@ -159,6 +151,7 @@ public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private class UrlAccountFetchingMapper implements RowMapper<Url> {
 
 		@Override
@@ -174,11 +167,14 @@ public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 			account.setId(rs.getLong("id2"));
 			account.setEmail(rs.getString("email2"));
 			account.setPassword(rs.getString("password2"));
+			account.setCreated(new Date(rs.getTimestamp("created2").getTime()));
+			account.setIsNotified(rs.getBoolean("is_notified2"));
+			account.setIsConfirmed(rs.getBoolean("is_confirmed"));
 			url.setAccount(account);
 			return url;
 		}
 	}
-	
+
 	private class UrlWithTagsExtractor implements ResultSetExtractor<List<Url>> {
 
 		public List<Url> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -197,10 +193,10 @@ public class UrlDaoImpl extends JdbcDaoSupport implements UrlDao {
 					map.put(id, url);
 				}
 				id = rs.getLong("id2");
-				if(id != 0) {
+				if (id != 0) {
 					Tag tag = new Tag();
 					tag.setId(id);
-					tag.setDescription(rs.getString("description2"));;
+					tag.setDescription(rs.getString("description2"));
 					url.getTags().add(tag);
 				}
 			}

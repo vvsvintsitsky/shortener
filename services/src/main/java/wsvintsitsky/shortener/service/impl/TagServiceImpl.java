@@ -13,7 +13,7 @@ import wsvintsitsky.shortener.service.TagService;
 
 @Service
 public class TagServiceImpl implements TagService {
-
+	
 	@Inject
 	private TagDao tagDao;
 	

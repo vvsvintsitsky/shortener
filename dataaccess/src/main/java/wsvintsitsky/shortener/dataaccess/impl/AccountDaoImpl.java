@@ -6,7 +6,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,14 @@ import wsvintsitsky.shortener.datamodel.Url;
 @Repository
 public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 
+	private final static String INSERT_ACCOUNT = "INSERT INTO account (email, password, created, is_notified, is_confirmed) VALUES (?, ?, ?, ?, ?)";
+	private final static String SELECT_ACCOUNT = "SELECT * FROM account where id = ?";
+	private final static String SELECT_ACCOUNT_BY_EMAIL_AND_PASSWORD = "SELECT * FROM account WHERE email = ? AND password = ?";
+	private final static String SELECT_ALLACCOUNTS = "SELECT * FROM account ORDER BY id";
+	private final static String DELETE_ACCOUNT = "DELETE FROM account WHERE id = ?";
+	private final static String DELETE_ALLACCOUNTS = "DELETE FROM account";
+	private final static String UPDATE_ACCOUNT = "UPDATE account SET email = ?, password = ?, created = ?, is_notified = ?, is_confirmed = ? WHERE id = ?";
+
 	@Autowired
 	public AccountDaoImpl(DataSource dataSource) {
 		setDataSource(dataSource);
@@ -36,15 +46,16 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 
 	@Override
 	public void insert(Account account) {
-
-		String INSERT_SQL = "INSERT INTO account (email, password) VALUES (?, ?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		getJdbcTemplate().update(new PreparedStatementCreator() {
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "id" });
+				PreparedStatement ps = connection.prepareStatement(INSERT_ACCOUNT, new String[] { "id" });
 				ps.setString(1, account.getEmail());
 				ps.setString(2, account.getPassword());
+				ps.setTimestamp(3, new Timestamp(account.getCreated().getTime()));
+				ps.setBoolean(4, account.getIsNotified());
+				ps.setBoolean(5, account.getIsConfirmed());
 				return ps;
 			}
 		}, keyHolder);
@@ -53,53 +64,54 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 
 	@Override
 	public Account get(Long id) {
+		Account account = getJdbcTemplate().queryForObject(SELECT_ACCOUNT, new Object[] { id }, new AccountMapper());
+		return account;
+	}
 
-		String SELECT_SQL = "SELECT * FROM account where id = ?";
-
-		Account account = getJdbcTemplate().queryForObject(SELECT_SQL, new Object[] { id }, new AccountMapper());
+	@Override
+	public Account getByEmailAndPassword(String email, String password) {
+		Account account = getJdbcTemplate().queryForObject(SELECT_ACCOUNT_BY_EMAIL_AND_PASSWORD,
+				new Object[] { email, password }, new AccountMapper());
 		return account;
 	}
 
 	@Override
 	public List<Account> getAll() {
-
-		String SELECT_SQL = "SELECT * FROM account ORDER BY id";
-
-		List<Account> accounts = getJdbcTemplate().query(SELECT_SQL, new AccountMapper());
+		List<Account> accounts = getJdbcTemplate().query(SELECT_ALLACCOUNTS, new AccountMapper());
 		return accounts;
 	}
 
 	@Override
 	public void delete(Long id) {
-
-		String DELETE_SQL = "DELETE FROM account WHERE id = ?";
-
-		getJdbcTemplate().update(DELETE_SQL, new Object[] { id });
+		getJdbcTemplate().update(DELETE_ACCOUNT, new Object[] { id });
 	}
 
 	@Override
 	public void deleteAll() {
-
-		String DELETE_SQL = "DELETE FROM account";
-
-		getJdbcTemplate().update(DELETE_SQL);
+		getJdbcTemplate().update(DELETE_ALLACCOUNTS);
 	}
 
 	@Override
 	public void update(Account account) {
-
-		String UPDATE_SQL = "UPDATE account SET email = ?, password = ? WHERE id = ?";
-
-		getJdbcTemplate().update(UPDATE_SQL,
-				new Object[] { account.getEmail(), account.getPassword(), account.getId() });
+		getJdbcTemplate()
+				.update(UPDATE_ACCOUNT,
+						new Object[] { account.getEmail(), account.getPassword(),
+								new Timestamp(account.getCreated().getTime()), account.getIsNotified(),
+								account.getIsConfirmed(), account.getId() });
 	}
 
 	@Override
-	public List<Account> findByCriteria() {
-		String SELECT_SQL = "SELECT account.id AS id1, account.email AS email1, account.password AS password1, url.id AS id2, url.short_url AS short_url2, url.long_url AS long_url2, url.description AS description2, url.visited AS visited2 FROM account LEFT OUTER JOIN url on account.id = url.account_id";
+	public List<Account> findNotNotified() {
+		String SELECT_SQL = "SELECT * FROM account WHERE account.is_notified IS FALSE";
 
-		List<Account> accounts = (List<Account>) getJdbcTemplate().query(SELECT_SQL, new AccountExtractor());
+		List<Account> accounts = (List<Account>) getJdbcTemplate().query(SELECT_SQL, new AccountMapper());
 		return accounts;
+	}
+
+	@Override
+	public void deleteNotConfirmed(Date date) {
+		String SELECT_SQL = "DELETE FROM account WHERE account.created < ? and account.is_confirmed IS FALSE";
+		getJdbcTemplate().update(SELECT_SQL, new Object[] { new Timestamp(date.getTime()) });
 	}
 
 	private class AccountMapper implements RowMapper<Account> {
@@ -110,10 +122,14 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 			account.setId(rs.getLong("id"));
 			account.setEmail(rs.getString("email"));
 			account.setPassword(rs.getString("password"));
+			account.setCreated(new Date(rs.getTimestamp("created").getTime()));
+			account.setIsNotified(rs.getBoolean("is_notified"));
+			account.setIsConfirmed(rs.getBoolean("is_confirmed"));
 			return account;
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private class AccountExtractor implements ResultSetExtractor<List<Account>> {
 
 		public List<Account> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -123,12 +139,13 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 				Long id = rs.getLong("id1");
 				account = map.get(id);
 				if (account == null) {
-					String email = rs.getString("email1");
-					String password = rs.getString("password1");
 					account = new Account();
 					account.setId(id);
-					account.setEmail(email);
-					account.setPassword(password);
+					account.setEmail(rs.getString("email1"));
+					account.setPassword(rs.getString("password1"));
+					account.setCreated(rs.getDate("created1"));
+					account.setIsNotified(rs.getBoolean("is_notified1"));
+					account.setIsConfirmed(rs.getBoolean("is_confirmed1"));
 					map.put(id, account);
 				}
 				Url url = new Url();
@@ -143,4 +160,5 @@ public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 			return new ArrayList<Account>(map.values());
 		}
 	}
+
 }

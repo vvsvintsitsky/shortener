@@ -1,0 +1,22 @@
+<web-fragment metadata-complete="true" version="3.0"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd">
+
+	<name>testservlet</name>
+
+	<servlet>
+		<display-name>TestServlet</display-name>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>wsvintsitsky.shortener.webapp.servlet.TestServlet</servlet-class>
+		<init-param>
+			<param-name>param1</param-name>
+			<param-value>PAR_1</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+
+</web-fragment>

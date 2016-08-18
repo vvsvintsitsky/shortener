@@ -22,11 +22,13 @@ public class UrlServiceImpl implements UrlService {
 	@Inject
 	private TagDao tagDao;
 	
+	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	
 	@Override
 	@Transactional
 	public void saveOrUpdate(Url url) {
 		if (url.getId() == null) {
-			url.setShortUrl(url.getLongUrl() + "_short");
+			url.setShortUrl(shortenUrl(url.getLongUrl()));
 			urlDao.insert(url);
 		} else {
 			urlDao.update(url);
@@ -62,12 +64,8 @@ public class UrlServiceImpl implements UrlService {
 	@Override
 	@Transactional
 	public void deleteAll() {
+		urlDao.deleteAllUrl2Tag();
 		urlDao.deleteAll();
-	}
-
-	@Override
-	public List<Url> findByCriteria() {
-		return urlDao.findByCriteria();
 	}
 
 	@Override
@@ -80,4 +78,17 @@ public class UrlServiceImpl implements UrlService {
 		return urlDao.getUrlsOnTagId(id);
 	}
 
+	private String shortenUrl(String longUrl) {
+		double id1 = (double)(longUrl.hashCode() + (double)4*2147483647);
+		int z;
+		StringBuilder sb = new StringBuilder();
+		while(id1 > 0) {
+			z = (int) (id1%62);
+			char ch = CHARS.charAt(z);
+			sb.append(ch);
+			id1 = (id1 - z)/62;
+		}
+		return sb.toString();
+	}
+	
 }

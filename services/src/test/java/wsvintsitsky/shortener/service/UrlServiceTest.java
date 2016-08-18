@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
@@ -26,39 +28,36 @@ public class UrlServiceTest {
 	
 	@Inject
 	private TagService tagService;
-	
+
+	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceTest.class);
+
 	@Test
 	public void testInsert() {
-//		wipeDB();
-//		
-//		Account account = new Account();
-//		account.setEmail("vvs@gmail.com");
-//		account.setPassword("password");
-//		accountService.saveOrUpdate(account);
-		Account account = accountService.get(1L);
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
 		
-		Url url = new Url();
-		url.setLongUrl("thr");
-		url.setVisited(0L);
-		url.setDescription("description");
+		Account account = databaseFiller.createAccounts(1).get(0);
+		Url url = databaseFiller.createUrls(1).get(0);
+		
+		accountService.saveOrUpdate(account);
+		account = accountService.get(account.getId());
 		url.setAccount(account);
-		
 		urlService.saveOrUpdate(url);
-		System.out.println(url);
 		
 		url = urlService.get(url.getId());
-		System.out.println(url);
 
 	}
 	
 	@Test
 	public void testUpdate() {
 		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
 		
-		Url url = new Url();
-		url.setLongUrl("long");
-		url.setVisited(0L);
-		url.setDescription("description");
+		Account account = databaseFiller.createAccounts(1).get(0);
+		accountService.saveOrUpdate(account);
+		
+		Url url = databaseFiller.createUrls(1).get(0);
+		url.setAccount(account);
 		
 		urlService.saveOrUpdate(url);
 		System.out.println(url);
@@ -72,11 +71,13 @@ public class UrlServiceTest {
 	@Test
 	public void testDelete() {
 		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
 		
-		Url url = new Url();
-		url.setLongUrl("long");
-		url.setVisited(0L);
+		Account account = databaseFiller.createAccounts(1).get(0);
+		accountService.saveOrUpdate(account);
 		
+		Url url = databaseFiller.createUrls(1).get(0);
+		url.setAccount(account);
 		urlService.saveOrUpdate(url);
 		
 		urlService.delete(url.getId());
@@ -84,40 +85,51 @@ public class UrlServiceTest {
 	}
 	
 	@Test
-	public void testFindByCriteria() {
-		List<Url> urls = urlService.findByCriteria();
-		
-		for(Url url : urls) {
-			System.out.println(url);
-		}
-	}
-	
-	@Test
 	public void testGetUrlsWithTags() {
-		List<Url> urls = urlService.getUrlsWithTags();
-		
-		for(Url url : urls) {
-			System.out.println(url);
-			for(Tag tag : url.getTags()) {
-				System.out.println(tag);
-			}
-			System.out.println();
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		List<Account> accounts = databaseFiller.createAccounts(1);
+		for(Account account : accounts) {
+			accountService.saveOrUpdate(account);
 		}
+		
+		List<Tag> tags = databaseFiller.createTags(1);
+		for (Tag tag : tags) {
+			tagService.saveOrUpdate(tag);
+		}
+		
+		List<Url> urls = databaseFiller.createUrls(1);
+		for (Url url : urls) {
+			url.setAccount(accounts.get(0));
+			url.setTags(tags);
+			urlService.saveOrUpdate(url);
+		}
+		
+		urls = urlService.getUrlsWithTags();
 	}
 	
 	@Test
 	public void testGetUrlsOnTagId() {
 		List<Url> urls = urlService.getUrlsOnTagId(2L);
-		
-		for(Url url : urls) {
-			System.out.println(url);
-		}
 	}
 	
 	@Test
 	public void testInsertUrl2Tag() {
-		Url url = urlService.get(1L);
-		Tag tag = tagService.get(1L);
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		
+		Account account = databaseFiller.createAccounts(1).get(0);
+		Url url = databaseFiller.createUrls(1).get(0);
+		Tag tag = databaseFiller.createTags(1).get(0);
+		
+		accountService.saveOrUpdate(account);
+		
+		url.setAccount(account);
+		urlService.saveOrUpdate(url);
+		tagService.saveOrUpdate(tag);
+		
+		url = urlService.get(url.getId());
+		tag = tagService.get(tag.getId());
 		url.getTags().add(tag);
 		urlService.saveOrUpdate(url);
 		
@@ -128,4 +140,5 @@ public class UrlServiceTest {
 		tagService.deleteAll();
 		accountService.deleteAll();
 	}
+	
 }

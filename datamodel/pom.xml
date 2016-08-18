@@ -4,12 +4,12 @@
 
 
 	<parent>
-		<groupId>wsvintsitsky.hotel</groupId>
-		<artifactId>parent-project</artifactId>
+		<groupId>wsvintsitsky.shortener</groupId>
+		<artifactId>shortener-parent-project</artifactId>
 		<version>1.0.0</version>
 	</parent>
 
-	<artifactId>datamodel</artifactId>
+	<artifactId>shortener-datamodel</artifactId>
 
 
 

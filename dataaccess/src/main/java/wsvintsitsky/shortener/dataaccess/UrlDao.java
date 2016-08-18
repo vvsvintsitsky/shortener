@@ -12,6 +12,8 @@ public interface UrlDao {
 	
 	void deleteUrl2Tag(Long id);
 	
+	void deleteAllUrl2Tag();
+	
 	Url get(Long id);
 	
 	List<Url> getAll();
@@ -21,8 +23,6 @@ public interface UrlDao {
 	void deleteAll();
 	
 	void update(Url url);
-	
-	List<Url> findByCriteria();
 	
 	List<Url> getUrlsWithTags();
 	

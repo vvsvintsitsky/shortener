@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,23 +32,49 @@ public class AccountServiceTest {
 	@Test
 	public void testInsert() {		
 		wipeDB();
-
-		Account account = new Account();
-		account.setEmail("Vlad");
-		account.setPassword("pass");
-		
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		Account account = databaseFiller.createAccounts(1).get(0);
 		accountService.saveOrUpdate(account);
+	}
+	
+	@Test
+	public void testGetAll() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();	
+		List<Account> accounts = accountService.getAll();
+	}
+	
+	@Test
+	public void testFindNotNotified() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		List<Account> accounts = databaseFiller.createAccounts(2);
+		accounts.get(0).setIsNotified(true);
+		for (Account account : accounts) {
+			accountService.saveOrUpdate(account);
+		}
+		accounts = accountService.findNotNotified();
+	}
+	
+	@Test
+	public void testDeleteNotConfirmed() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		List<Account> accounts = databaseFiller.createAccounts(2);
+		Account acc = accounts.get(0);
+		for (Account account : accounts) {
+			accountService.saveOrUpdate(account);
+			System.out.println(account);
+		}
+		accountService.deleteNotConfirmed();
 	}
 	
 	@Test
 	public void testUpdate() {
 		wipeDB();
-		
-		Account account = new Account();
-		account.setEmail("Vlad");
-		account.setPassword("pass");
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		Account account = databaseFiller.createAccounts(1).get(0);
 		accountService.saveOrUpdate(account);
-		
 		account.setPassword("password");
 		accountService.saveOrUpdate(account);
 		
@@ -56,26 +83,24 @@ public class AccountServiceTest {
 	@Test
 	public void testDelete() {
 		wipeDB();
-		
-		Account account = new Account();
-		account.setEmail("Vlad");
-		account.setPassword("pass");
-		
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		Account account = databaseFiller.createAccounts(1).get(0);
+		accountService.saveOrUpdate(account);
 		accountService.delete(account.getId());
 		
 	}
 	
 	@Test
-	public void testFindByCriteria() {
-		List<Account> accounts = accountService.findByCriteria();
-		
-		for(Account account : accounts) {
-			System.out.println(account);
-			for(Url url : account.getUrls()) {
-				System.out.println(url);
-			}
-		}
-		
+	public void testGetByEmailAndPassword() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		String email = "v.v.svintsitsky@gmail.com";
+		String password = "admin";
+		Account account = databaseFiller.createAccounts(1).get(0);
+		account.setEmail(email);
+		account.setPassword(password);
+		accountService.saveOrUpdate(account);
+		account = accountService.getByEmailAndPassword(email, password);
 	}
 	
 	private void wipeDB() {

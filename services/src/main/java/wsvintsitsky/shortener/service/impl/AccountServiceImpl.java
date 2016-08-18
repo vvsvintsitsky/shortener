@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -21,6 +22,9 @@ public class AccountServiceImpl implements AccountService {
 	@Transactional
 	public void saveOrUpdate(Account account) {
 		if (account.getId() == null) {
+			account.setCreated(new Date());
+			account.setIsConfirmed(false);
+			account.setIsNotified(false);
 			accountDao.insert(account);
 		} else {
 			accountDao.update(account);
@@ -32,6 +36,11 @@ public class AccountServiceImpl implements AccountService {
 		return accountDao.get(id);
 	}
 
+	@Override
+	public Account getByEmailAndPassword(String email, String password) {
+		return accountDao.getByEmailAndPassword(email, password);
+	}
+	
 	@Override
 	public List<Account> getAll() {
 		return accountDao.getAll();
@@ -50,7 +59,15 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public List<Account> findByCriteria() {
-		return accountDao.findByCriteria();
+	public List<Account> findNotNotified() {
+		return accountDao.findNotNotified();
 	}
+	
+	@Override
+	public void deleteNotConfirmed() {
+		Date date = new Date();
+		date.setTime(date.getTime() - 48 * 3600 * 1000);
+		accountDao.deleteNotConfirmed(date);
+	}
+
 }

@@ -19,12 +19,21 @@
 	<context:component-scan base-package="wsvintsitsky.shortener.service.impl" />
 	<context:component-scan base-package="wsvintsitsky.shortener.dataaccess.impl" />
 
-
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="config/database/database.properties"/>
+	</bean>
+	
 	<bean id="dataSource"
 		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
-		destroy-method="close" p:driverClassName="org.postgresql.Driver"
-		p:url="jdbc:postgresql://localhost:5432/hotel" p:username="postgres"
-		p:password="7muCC" p:schema="public" />
+		destroy-method="close">
+
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}" />
+		<property name="schema" value="${jdbc.schema}" />
+	</bean>
 
 	<tx:annotation-driven />
 
@@ -32,7 +41,7 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
+
 	<!-- <bean id="jdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate"> 
 		<constructor-arg ref="dataSource" /> </bean> -->
 

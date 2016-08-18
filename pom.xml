@@ -2,51 +2,53 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>wsvintsitsky.hotel</groupId>
-	<artifactId>parent-project</artifactId>
+	<groupId>wsvintsitsky.shortener</groupId>
+	<artifactId>shortener-parent-project</artifactId>
 	<version>1.0.0</version>
 
 	<packaging>pom</packaging>
 
 	<properties>
 		<spring.version>4.0.3.RELEASE</spring.version>
-		<wicket.version>7.1.0</wicket.version>
-		<jetty9.version>9.2.13.v20150730</jetty9.version>
 	</properties>
 
 	<modules>
 		<module>datamodel</module>
 		<module>dataaccess</module>
 		<module>services</module>
-		<!-- <module>webapp</module> -->
+		<module>webapp</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
 
 			<dependency>
-				<groupId>wsvintsitsky.hotel</groupId>
-				<artifactId>datamodel</artifactId>
+				<groupId>wsvintsitsky.shortener</groupId>
+				<artifactId>shortener-datamodel</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<groupId>wsvintsitsky.hotel</groupId>
-				<artifactId>dataaccess</artifactId>
+				<groupId>wsvintsitsky.shortener</groupId>
+				<artifactId>shortener-dataaccess</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-				<groupId>wsvintsitsky.hotel</groupId>
-				<artifactId>services</artifactId>
+				<groupId>wsvintsitsky.shortener</groupId>
+				<artifactId>shortener-services</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-
+			<dependency>
+				<groupId>wsvintsitsky.shortener</groupId>
+				<artifactId>shortener-webapp</artifactId>
+				<version>1.0.0</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.glassfish.main.resources</groupId>
 				<artifactId>javamail-runtime</artifactId>
 				<version>4.1.1</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.sun.mail</groupId>
 				<artifactId>javax.mail</artifactId>
@@ -66,18 +68,17 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-jpamodelgen</artifactId>
-				<version>4.3.4.Final</version>
-				<scope>provided</scope>
-			</dependency>
-
-
-			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
 				<version>1</version>
 			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+			</dependency>
+
 			<!-- Spring framework -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -155,96 +156,12 @@
 			</dependency>
 
 
-
-
-			<!-- WICKET DEPENDENCIES -->
-			<dependency>
-				<groupId>org.apache.wicket</groupId>
-				<artifactId>wicket-auth-roles</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.wicket</groupId>
-				<artifactId>wicket-core</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.wicket</groupId>
-				<artifactId>wicket-extensions</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-
-
-
-
-			<dependency>
-				<groupId>org.apache.wicket</groupId>
-				<artifactId>wicket-spring</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.wicket</groupId>
-				<artifactId>wicket-datetime</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-
-			<!-- JQUERY DEPENDENCIES -->
-
-			<dependency>
-				<groupId>com.googlecode.wicket-jquery-ui</groupId>
-				<artifactId>wicket-jquery-ui</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.googlecode.wicket-jquery-ui</groupId>
-				<artifactId>wicket-jquery-ui-core</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.googlecode.wicket-jquery-ui</groupId>
-				<artifactId>wicket-jquery-ui-plugins</artifactId>
-				<version>${wicket.version}</version>
-			</dependency>
-
-			<!-- JETTY DEPENDENCIES FOR TESTING -->
-			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-server</artifactId>
-				<version>${jetty9.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-webapp</artifactId>
-				<version>${jetty9.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-util</artifactId>
-				<version>${jetty9.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-jmx</artifactId>
-				<version>${jetty9.version}</version>
-				<scope>test</scope>
-			</dependency>
-
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>${spring.version}</version>
-			</dependency>
-
-
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
 
+
+	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>

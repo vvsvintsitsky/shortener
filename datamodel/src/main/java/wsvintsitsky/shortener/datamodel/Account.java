@@ -1,6 +1,7 @@
 package wsvintsitsky.shortener.datamodel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Account extends AbstractModel{
@@ -11,6 +12,12 @@ public class Account extends AbstractModel{
 	
 	private String password;
 
+	private Date created;
+	
+	private Boolean isNotified;
+	
+	private Boolean isConfirmed;
+	
 	private List<Url> urls = new ArrayList<Url>();
 	
 	public String getEmail() {
@@ -29,6 +36,30 @@ public class Account extends AbstractModel{
 		this.password = password;
 	}
 
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Boolean getIsNotified() {
+		return isNotified;
+	}
+
+	public void setIsNotified(Boolean isNotified) {
+		this.isNotified = isNotified;
+	}
+
+	public Boolean getIsConfirmed() {
+		return isConfirmed;
+	}
+
+	public void setIsConfirmed(Boolean isConfirmed) {
+		this.isConfirmed = isConfirmed;
+	}
+
 	public List<Url> getUrls() {
 		return urls;
 	}
@@ -39,7 +70,8 @@ public class Account extends AbstractModel{
 
 	@Override
 	public String toString() {
-		return "Account [id=" + getId() + ", email=" + email + ", password=" + password + "]";
+		return "Account [email=" + email + ", password=" + password + ", created=" + created + ", isNotified="
+				+ isNotified + ", isConfirmed=" + isConfirmed + ", urls=" + urls + "]";
 	}
 
 	@Override

@@ -5,8 +5,8 @@
 			<PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n" />
 		</Console>
 
-		<RollingFile name="SERVER_LOGFILE" fileName="/logs/webHotel.log"
-			filePattern="/logs/webHotel-%d{MM-dd-yyyy}.log.gz">
+		<RollingFile name="SERVER_LOGFILE" fileName="/logs/shortener.log"
+			filePattern="/logs/shortener-%d{MM-dd-yyyy}.log.gz">
 			<PatternLayout>
 				<Charset>UTF-8</Charset>
 				<Pattern>%d %-5p %-5c{3}:%L %x -> %m%n</Pattern>
@@ -19,7 +19,7 @@
 	</Appenders>
 	<Loggers>
 
-		<Logger name="wsvintsitsky.hotel.webapp" level="WARN"
+		<Logger name="wsvintsitsky.shortener.service" level="WARN"
 			additivity="false">
 			<AppenderRef ref="CONSOLE" />
 			<AppenderRef ref="SERVER_LOGFILE" />

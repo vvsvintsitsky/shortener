@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.dataaccess;
 
+import java.util.Date;
 import java.util.List;
 
 import wsvintsitsky.shortener.datamodel.Account;
@@ -10,6 +11,8 @@ public interface AccountDao {
 	
 	Account get(Long id);
 	
+	Account getByEmailAndPassword(String email, String password);
+	
 	List<Account> getAll();
 	
 	void delete(Long id);
@@ -18,5 +21,7 @@ public interface AccountDao {
 	
 	void update(Account account);
 	
-	List<Account> findByCriteria();
+	List<Account> findNotNotified();
+	
+	void deleteNotConfirmed(Date date);
 }
