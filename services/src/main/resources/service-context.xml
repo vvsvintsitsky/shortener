@@ -21,7 +21,7 @@
 
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="config/database/database.properties"/>
+		<property name="location" value="database/database.properties"/>
 	</bean>
 	
 	<bean id="dataSource"

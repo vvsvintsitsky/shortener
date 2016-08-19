@@ -5,14 +5,36 @@
 	id="WebApp_ID" version="3.0">
 	<display-name>WSvintsitskyShortener</display-name>
 
-	<absolute-ordering>
-		<name>contextparam</name>
-		<name>listener</name>
-		<name>loginservlet</name>
-		<name>registrationservlet</name>
-		<name>sessionconfig</name>
-		<name>testservlet</name>
-		<name>welcomefilelist</name>
-	</absolute-ordering>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:web-applicationContext.xml</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<display-name>ControllerServlet</display-name>
+		<servlet-name>ControllerServlet</servlet-name>
+		<servlet-class>wsvintsitsky.shortener.webapp.servlet.ControllerServlet</servlet-class>
+		<init-param>
+			<param-name>param1</param-name>
+			<param-value>PAR_1</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>ControllerServlet</servlet-name>
+		<url-pattern>/controller</url-pattern>
+	</servlet-mapping>
+	
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
 
 </web-app>

@@ -64,7 +64,6 @@ public class AccountServiceTest {
 		Account acc = accounts.get(0);
 		for (Account account : accounts) {
 			accountService.saveOrUpdate(account);
-			System.out.println(account);
 		}
 		accountService.deleteNotConfirmed();
 	}
