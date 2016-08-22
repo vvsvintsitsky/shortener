@@ -3,8 +3,8 @@ CREATE TABLE "account" (
 	"email" character varying(50) NOT NULL,
 	"password" character varying(50) NOT NULL,
 	"created" TIMESTAMP NOT NULL,
-	"is_notified" BOOLEAN NOT NULL,
-	"is_confirmed" BOOLEAN NOT NULL,
+    "is_notified" BOOLEAN NOT NULL,
+    "is_confirmed" BOOLEAN NOT NULL,
 	CONSTRAINT account_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

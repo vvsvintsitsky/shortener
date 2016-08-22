@@ -5,13 +5,13 @@
                                  http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
 	version="1.0">
 
-	<persistence-unit name="wsvintsitsky-webHotel-unit">
+	<persistence-unit name="wsvintsitsky-shortener-unit">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect" />
 			<property name="hibernate.ejb.naming_strategy"
-				value="wsvintsitsky.hotel.datamodel.util.CustomImprovedNamingStrategy" />
-			<property name="hibernate.show_sql" value="true" />
+				value="wsvintsitsky.shortener.datamodel.util.CustomImprovedNamingStrategy" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />
 		</properties>
 	</persistence-unit>

@@ -3,20 +3,37 @@ package wsvintsitsky.shortener.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class Url extends AbstractModel{
 
 	private static final long serialVersionUID = 1L;
 
+	@Column
 	private String shortUrl;
 	
+	@Column
 	private String longUrl;
 	
+	@Column
 	private Long visited;
 
+	@Column
 	private String description;
 	
+	@ManyToOne(targetEntity = Account.class, fetch = FetchType.LAZY)
 	private Account account;
 	
+	@JoinTable(name = "url_2_tag", joinColumns = {
+			@JoinColumn(name = "url_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+	@ManyToMany(targetEntity = Tag.class)
 	private List<Tag> tags = new ArrayList<Tag>();
 
 	public String getShortUrl() {
@@ -70,7 +87,7 @@ public class Url extends AbstractModel{
 	@Override
 	public String toString() {
 		return "Url [id=" + getId() + ", shortUrl=" + shortUrl + ", longUrl=" + longUrl + ", visited=" + visited + ", description="
-				+ description + ", account=" + account + "]";
+				+ description + "]";
 	}
 
 	@Override

@@ -16,7 +16,5 @@ void saveOrUpdate(Url url);
 	
 	void deleteAll();
 
-	List<Url> getUrlsWithTags();
-	
-	List<Url> getUrlsOnTagId(Long id);
+	Url getUrlWithTags(Long id);
 }

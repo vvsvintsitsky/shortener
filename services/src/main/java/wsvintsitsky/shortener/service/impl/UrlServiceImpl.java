@@ -7,9 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.dataaccess.UrlDao;
-import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
 
@@ -18,9 +16,6 @@ public class UrlServiceImpl implements UrlService {
 
 	@Inject
 	private UrlDao urlDao;
-
-	@Inject
-	private TagDao tagDao;
 	
 	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
@@ -33,15 +28,6 @@ public class UrlServiceImpl implements UrlService {
 		} else {
 			urlDao.update(url);
 		}
-		for(Tag tag : url.getTags()) {
-			if (tag.getId() == null) {
-				tagDao.insert(tag);
-			} else {
-				tagDao.update(tag);
-			}
-		}
-		urlDao.deleteUrl2Tag(url.getId());
-		urlDao.insertUrl2Tag(url);
 	}
 
 	@Override
@@ -57,26 +43,15 @@ public class UrlServiceImpl implements UrlService {
 	@Override
 	@Transactional
 	public void delete(Long id) {
-		urlDao.deleteUrl2Tag(id);
 		urlDao.delete(id);
 	}
 
 	@Override
 	@Transactional
 	public void deleteAll() {
-		urlDao.deleteAllUrl2Tag();
 		urlDao.deleteAll();
 	}
 
-	@Override
-	public List<Url> getUrlsWithTags() {
-		return urlDao.getUrlsWithTags();
-	}
-
-	@Override
-	public List<Url> getUrlsOnTagId(Long id) {
-		return urlDao.getUrlsOnTagId(id);
-	}
 
 	private String shortenUrl(String longUrl) {
 		double id1 = (double)(longUrl.hashCode() + (double)4*2147483647);
@@ -89,6 +64,11 @@ public class UrlServiceImpl implements UrlService {
 			id1 = (id1 - z)/62;
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public Url getUrlWithTags(Long id) {
+		return urlDao.getUrlWithTags(id);
 	}
 	
 }

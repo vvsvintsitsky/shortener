@@ -1,24 +1,89 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>FirstSTest</title>
+<title>Index Page</title>
 </head>
-<body>
-	<form action="test" method="GET">
-		<input type="submit" value="Execute">
-	</form>
+<script
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+	var prefix = 'myservice';
 
-	<jsp:useBean id="calendar" class="java.util.GregorianCalendar" />
-	<form action="timeaction" method="POST">
-		<input type="hidden" name="time" value="${calendar.timeInMillis}" />
-		<input type="submit" name="button" value="Посчитать время" />
-	</form>
-	
-	<a href="login">Login</a>
-	<a href="registration">Registration</a>
-	
+	var RestGet = function() {
+		$.ajax({
+			type : 'GET',
+			url : prefix + '/' + Date.now(),
+			dataType : 'json',
+			async : true,
+			success : function(result) {
+				alert('Time ' + result.time + ', message:'
+						+ result.message);
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alert(jqXHR.status + ' ' + jqXHR.responseText);
+			}
+		});
+	}
+
+	var RestPut = function() {
+		var JSONObject = {
+			"time" : Date.now(),
+			"message" : "PUT method usage example"
+		};
+
+		$.ajax({
+			type : 'PUT',
+			url : prefix,
+			contentType : 'application/json; charset=utf-8',
+			data : JSON.stringify(JSONObject),
+			dataType : 'json',
+			async : true,
+			success : function(result) {
+				alert('Time ' + result.time + ', message:'
+						+ result.message);
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alert(jqXHR.status + ' ' + jqXHR.responseText);
+			}
+		});
+	}
+
+	var RestPost = function() {
+		$.ajax({
+			type : 'POST',
+			url : prefix,
+			dataType : 'json',
+			async : true,
+			success : function(result) {
+				alert('Time ' + result.time + ', message:'
+						+ result.message);
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alert(jqXHR.status + ' ' + jqXHR.responseText);
+			}
+		});
+	}
+
+	var RestDelete = function() {
+		$.ajax({
+			type : 'DELETE',
+			url : prefix + '/' + Date.now(),
+			dataType : 'json',
+			async : true,
+			success : function(result) {
+				alert('Time ' + result.time + ', message:'
+						+ result.message);
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				alert(jqXHR.status + ' ' + jqXHR.responseText);
+			}
+		});
+	}
+</script>
+<body>
+ 
+    <button type="button" onclick="RestGet()">Method GET</button>
+    <button type="button" onclick="RestPost()">Method POST</button>
+    <button type="button" onclick="RestDelete()">Method DELETE</button>
+    <button type="button" onclick="RestPut()">Method PUT</button>
+ 
 </body>
 </html>

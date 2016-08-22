@@ -64,6 +64,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 	
 	@Override
+	@Transactional
 	public void deleteNotConfirmed() {
 		Date date = new Date();
 		date.setTime(date.getTime() - 48 * 3600 * 1000);

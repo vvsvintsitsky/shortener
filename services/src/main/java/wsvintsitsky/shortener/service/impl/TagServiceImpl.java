@@ -49,4 +49,9 @@ public class TagServiceImpl implements TagService {
 		tagDao.deleteAll();
 	}
 
+	@Override
+	public Tag getTagWithUrls(Long id) {
+		return tagDao.getTagWithUrls(id);
+	}
+
 }

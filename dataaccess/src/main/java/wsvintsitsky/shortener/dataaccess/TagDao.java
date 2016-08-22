@@ -1,20 +1,8 @@
 package wsvintsitsky.shortener.dataaccess;
 
-import java.util.List;
-
 import wsvintsitsky.shortener.datamodel.Tag;
 
-public interface TagDao {
+public interface TagDao extends AbstractDao<Tag, Long> {
 
-	void insert(Tag tag);
-	
-	Tag get(Long id);
-	
-	List<Tag> getAll();
-	
-	void delete(Long id);
-	
-	void deleteAll();
-	
-	void update(Tag tag);
+	Tag getTagWithUrls(Long id);
 }
