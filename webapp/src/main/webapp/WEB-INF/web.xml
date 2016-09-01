@@ -3,7 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
-	<display-name>CrunchifySpringMVCTutorial</display-name>
+	<display-name>WSvintsitskyShortener</display-name>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -13,24 +13,50 @@
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
-
 	
  	<welcome-file-list>
     	<welcome-file>index.jsp</welcome-file>
   	</welcome-file-list>
  	
- 	 <servlet>
-        <servlet-name>greeting</servlet-name>
+ 	<servlet>
+        <servlet-name>gate</servlet-name>
         <servlet-class>
             org.springframework.web.servlet.DispatcherServlet
         </servlet-class>
         <load-on-startup>1</load-on-startup>
-    </servlet>
+    </servlet> 
     <servlet-mapping>
-        <servlet-name>greeting</servlet-name>
+        <servlet-name>gate</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
- 
+     
+    <filter>
+		<filter-name>encodingfilter</filter-name>
+		<filter-class>wsvintsitsky.shortener.webapp.filter.EncodingFilter</filter-class>
+		<init-param>
+ 			<param-name>encoding</param-name>
+ 			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingfilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>accessfilter</filter-name>
+		<filter-class>wsvintsitsky.shortener.webapp.filter.AccessFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>accessfilter</filter-name>
+		<url-pattern>/service/*</url-pattern>
+	</filter-mapping>
+<!--
+	<error-page>
+        <error-code>404</error-code>
+        <location>/error/error.jsp</location>
+	</error-page>
+ --> 
 	<session-config>
 		<session-timeout>30</session-timeout>
 	</session-config>

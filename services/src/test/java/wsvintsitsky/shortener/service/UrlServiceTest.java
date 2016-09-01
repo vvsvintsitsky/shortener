@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,13 +102,38 @@ public class UrlServiceTest {
 		url.setTags(tags);
 		urlService.saveOrUpdate(url);
 
-		url = urlService.getUrlWithTags(url.getId());
+		url = urlService.getUrlWithTags(url.getShortUrl());
 		for(Tag tag : url.getTags()) {
 			tag.setDescription(tag.getDescription() + "changed");
 		}
 		urlService.saveOrUpdate(url);
 	}
 
+	@Test
+	public void testgetLongUrlByShortUrl() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		List<Account> accounts = databaseFiller.createAccounts(1);
+		for (Account account : accounts) {
+			accountService.saveOrUpdate(account);
+		}
+
+		List<Tag> tags = databaseFiller.createTags(1);
+		for (Tag tag : tags) {
+			tagService.saveOrUpdate(tag);
+		}
+
+		Url url = databaseFiller.createUrls(1).get(0);
+		url.setAccount(accounts.get(0));
+		url.setTags(tags);
+		urlService.saveOrUpdate(url);
+		
+		String lg = url.getLongUrl();
+		
+		String ur = urlService.getLongUrlByShortUrl(url.getShortUrl());
+		Assert.isTrue(lg.equals(ur));
+	}
+	
 	private void wipeDB() {
 		urlService.deleteAll();
 		tagService.deleteAll();

@@ -3,6 +3,7 @@ package wsvintsitsky.shortener.service.impl;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -67,8 +68,25 @@ public class UrlServiceImpl implements UrlService {
 	}
 
 	@Override
-	public Url getUrlWithTags(Long id) {
-		return urlDao.getUrlWithTags(id);
+	public Url getUrlWithTags(String shortUrl) {
+		return urlDao.getUrlWithTags(shortUrl);
+	}
+
+	@Override
+	@Transactional
+	public String getLongUrlByShortUrl(String shortUrl) {
+		Url url = null;
+		try{
+			url = urlDao.getUrlByShortUrl(shortUrl);
+		} catch (NoResultException ex) {
+			return null;
+		}
+		
+		Long visited = url.getVisited();
+		visited++;
+		url.setVisited(visited);
+		urlDao.update(url);
+		return url.getLongUrl();
 	}
 	
 }

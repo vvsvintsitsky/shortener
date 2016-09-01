@@ -16,5 +16,7 @@ void saveOrUpdate(Url url);
 	
 	void deleteAll();
 
-	Url getUrlWithTags(Long id);
+	Url getUrlWithTags(String shortUrl);
+	
+	String getLongUrlByShortUrl(String shortUrl);
 }

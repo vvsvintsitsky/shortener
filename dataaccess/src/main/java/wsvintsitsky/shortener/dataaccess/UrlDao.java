@@ -4,5 +4,7 @@ import wsvintsitsky.shortener.datamodel.Url;
 
 public interface UrlDao extends AbstractDao<Url, Long> {
 
-	Url getUrlWithTags(Long id);
+	Url getUrlByShortUrl(String shortUrl);
+	
+	Url getUrlWithTags(String shortUrl);
 }

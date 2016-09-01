@@ -1,5 +1,8 @@
 package wsvintsitsky.shortener.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -57,6 +60,21 @@ public class TagServiceTest {
 		Tag tag = databaseFiller.createTags(1).get(0);
 		tagService.saveOrUpdate(tag);
 		tagService.delete(tag.getId());
+	}
+	
+	@Test
+	public void testGetExistingTags() {
+		wipeDB();
+		DatabaseFiller databaseFiller = new DatabaseFiller();
+		List<Tag> tags = databaseFiller.createTags(2);
+		for (Tag tag2 : tags) {
+			tagService.saveOrUpdate(tag2);
+		}
+		
+		List<String> tagDescriptions = new ArrayList<String>();
+		tagDescriptions.add(tags.get(0).getDescription());
+		tagDescriptions.add("tgD");
+		tags = tagService.getExistingTags(tagDescriptions);
 	}
 	
 	private void wipeDB() {

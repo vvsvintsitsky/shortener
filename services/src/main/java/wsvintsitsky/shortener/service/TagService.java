@@ -18,4 +18,5 @@ public interface TagService {
 	
 	Tag getTagWithUrls(Long id);
 
+	List<Tag> getExistingTags(List<String> tagDescriptions);
 }

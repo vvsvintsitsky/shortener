@@ -1,5 +1,7 @@
 package wsvintsitsky.shortener.dataaccess.impl;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -34,6 +36,20 @@ public class TagDaoImpl extends AbstractDaoImpl<Tag, Long> implements TagDao {
 		
 		TypedQuery<Tag> q = em.createQuery(cq);
 		return q.getSingleResult();
+	}
+
+	@Override
+	public List<Tag> getExistingTags(List tagDescriptions) {
+		EntityManager em = getEntityManager();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
+		Root<Tag> from = cq.from(Tag.class);
+		
+//		Predicate extistenceCondition = cb.equal(from.get(Tag_.description), tagDescriptions);
+		cq.where(from.get(Tag_.description).in(tagDescriptions));
+		
+		TypedQuery<Tag> q = em.createQuery(cq);
+		return q.getResultList();
 	}
 	
 }

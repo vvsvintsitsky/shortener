@@ -22,18 +22,32 @@ public class UrlDaoImpl extends AbstractDaoImpl<Url, Long> implements UrlDao {
 	}
 
 	@Override
-	public Url getUrlWithTags(Long id) {
+	public Url getUrlWithTags(String shortUrl) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Url> cq = cb.createQuery(Url.class);
 		Root<Url> from = cq.from(Url.class);
-		
+
 		from.fetch(Url_.tags, JoinType.LEFT);
-		Predicate idCondition = cb.equal(from.get(Url_.id), id);
-		cq.where(idCondition);
-		
+		Predicate shortUrlCondition = cb.equal(from.get(Url_.shortUrl), shortUrl);
+		cq.where(shortUrlCondition);
+
 		TypedQuery<Url> q = em.createQuery(cq);
 		return q.getSingleResult();
 	}
-	
+
+	@Override
+	public Url getUrlByShortUrl(String shortUrl) {
+		EntityManager em = getEntityManager();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Url> cq = cb.createQuery(Url.class);
+		Root<Url> from = cq.from(Url.class);
+
+		Predicate shortUrlCondition = cb.equal(from.get(Url_.shortUrl), shortUrl);
+		cq.where(shortUrlCondition);
+
+		TypedQuery<Url> q = em.createQuery(cq);
+		return q.getSingleResult();
+	}
+
 }
