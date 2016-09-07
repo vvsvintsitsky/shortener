@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import io.jsonwebtoken.JwtBuilder;
@@ -21,6 +21,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
+import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 
 @Controller
@@ -33,15 +34,14 @@ public class LoginController {
 	private final String secret = ConfigurationManager.getProperty("jwt.encoding.secret");
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String login = request.getParameter("login");
-		String password = request.getParameter("password");
+	public void loginAjax(HttpServletRequest request, HttpServletResponse response, @RequestBody AccountWeb accountWeb) throws IOException {
+		String login = accountWeb.getEmail();
+		String password = accountWeb.getPassword();
 		Account account = accountService.getByEmailAndPassword(login, password);
 		String jwt = createJWT(account);
 		String jwtName = ConfigurationManager.getProperty("jwt.name");
-		Cookie cookie = new Cookie(jwtName, jwt);
-		response.addCookie(cookie);
-		response.sendRedirect(request.getContextPath());
+		response.setHeader(jwtName, jwt);
+//		response.sendRedirect(request.getContextPath());
 	}
 	
 	private String createJWT(Account account) {

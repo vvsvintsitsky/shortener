@@ -24,28 +24,27 @@ public class TagDaoImpl extends AbstractDaoImpl<Tag, Long> implements TagDao {
 	}
 
 	@Override
-	public Tag getTagWithUrls(Long id) {
+	public Tag getTagWithUrls(String tagDescription) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
 		Root<Tag> from = cq.from(Tag.class);
 		
 		from.fetch(Tag_.urls, JoinType.LEFT);
-		Predicate idCondition = cb.equal(from.get(Tag_.id), id);
-		cq.where(idCondition);
+		Predicate tagDescriptionCondition = cb.equal(from.get(Tag_.description), tagDescription);
+		cq.where(tagDescriptionCondition);
 		
 		TypedQuery<Tag> q = em.createQuery(cq);
 		return q.getSingleResult();
 	}
 
 	@Override
-	public List<Tag> getExistingTags(List tagDescriptions) {
+	public List<Tag> getExistingTags(List<String> tagDescriptions) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
 		Root<Tag> from = cq.from(Tag.class);
 		
-//		Predicate extistenceCondition = cb.equal(from.get(Tag_.description), tagDescriptions);
 		cq.where(from.get(Tag_.description).in(tagDescriptions));
 		
 		TypedQuery<Tag> q = em.createQuery(cq);

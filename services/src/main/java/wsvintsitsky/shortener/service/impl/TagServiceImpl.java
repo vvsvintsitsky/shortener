@@ -8,7 +8,9 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.TagDao;
+import wsvintsitsky.shortener.dataaccess.UrlDao;
 import wsvintsitsky.shortener.datamodel.Tag;
+import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.TagService;
 
 @Service
@@ -16,6 +18,9 @@ public class TagServiceImpl implements TagService {
 
 	@Inject
 	private TagDao tagDao;
+
+	@Inject
+	UrlDao urlDao;
 
 	@Override
 	@Transactional
@@ -50,21 +55,22 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
-	public Tag getTagWithUrls(Long id) {
-		return tagDao.getTagWithUrls(id);
+	public Tag getTagWithUrls(String tagDescription) {
+		return tagDao.getTagWithUrls(tagDescription);
 	}
 
 	@Override
 	@Transactional
-	public List<Tag> getExistingTags(List<String> tagDescriptions) {
+	public Url updateUrlsTags(Long urlId, List<String> tagDescriptions) {
+		Url url = urlDao.get(urlId);
 		List<Tag> existingTags = tagDao.getExistingTags(tagDescriptions);
-		boolean exists;
-		for (Tag existingTag : existingTags) {
-			exists = tagDescriptions.contains(existingTag.getDescription());
-			if (exists) {
-				tagDescriptions.remove(existingTag.getDescription());
-			}
-		}
+		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
+		insertNewTags(tagDescriptions, existingTags);
+		url.setTags(existingTags);
+		return urlDao.update(url);
+	}
+
+	private void insertNewTags(List<String> tagDescriptions, List<Tag> existingTags) {
 		Tag tag;
 		for (String tagDescription : tagDescriptions) {
 			tag = new Tag();
@@ -72,7 +78,17 @@ public class TagServiceImpl implements TagService {
 			tagDao.insert(tag);
 			existingTags.add(tag);
 		}
-		return existingTags;
+
+	}
+
+	private void removeExistingTagsFromDescriptions(List<String> tagDescriptions, List<Tag> existingTags) {
+		boolean exists;
+		for (Tag existingTag : existingTags) {
+			exists = tagDescriptions.contains(existingTag.getDescription());
+			if (exists) {
+				tagDescriptions.remove(existingTag.getDescription());
+			}
+		}
 	}
 
 }

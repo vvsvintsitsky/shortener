@@ -1,4 +1,4 @@
-package wsvintsitsky.shortener.webapp.resource;
+package wsvintsitsky.shortener.webapp.datamodel;
 
 public class JSONTestClass {
 	private Long time;

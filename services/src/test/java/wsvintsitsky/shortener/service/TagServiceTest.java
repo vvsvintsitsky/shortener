@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
+import wsvintsitsky.shortener.datamodel.Url;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
@@ -67,14 +69,19 @@ public class TagServiceTest {
 		wipeDB();
 		DatabaseFiller databaseFiller = new DatabaseFiller();
 		List<Tag> tags = databaseFiller.createTags(2);
+		Account account = databaseFiller.createAccounts(1).get(0);
+		Url url = databaseFiller.createUrls(1).get(0);
+		accountService.saveOrUpdate(account);
+		url.setAccount(account);
+		urlService.saveOrUpdate(url);
+		List<String> incomingTagDescriptions = new ArrayList<String>();
 		for (Tag tag2 : tags) {
+			tag2.getUrls().add(url);
 			tagService.saveOrUpdate(tag2);
+			incomingTagDescriptions.add(tag2.getDescription());
 		}
-		
-		List<String> tagDescriptions = new ArrayList<String>();
-		tagDescriptions.add(tags.get(0).getDescription());
-		tagDescriptions.add("tgD");
-		tags = tagService.getExistingTags(tagDescriptions);
+		incomingTagDescriptions.add("newTagD");
+		tagService.updateUrlsTags(url.getId(), incomingTagDescriptions);
 	}
 	
 	private void wipeDB() {

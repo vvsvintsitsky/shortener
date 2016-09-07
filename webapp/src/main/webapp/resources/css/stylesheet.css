@@ -1,3 +1,21 @@
 body {
 	background-image: url("../images/bubbles.jpg");
 }
+
+#angularjs-app {
+	color: #ffffff;
+}
+
+table, th, td {
+	border: 1px solid grey;
+	border-collapse: collapse;
+	padding: 5px;
+}
+
+table tr:nth-child(odd) {
+	background-color: #0080ff;
+}
+
+table tr:nth-child(even) {
+	background-color: #0080c0;
+}

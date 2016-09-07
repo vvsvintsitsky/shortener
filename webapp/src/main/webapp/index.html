@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="mainApp">
+<head>
+	<title>Index Page</title>
+	<link rel="stylesheet" type="text/css" href="./resources/css/stylesheet.css"/>
+	
+	<script src="./resources/js/jquery/3.1.0/jquery.js"></script>
+	<script src="./resources/js/angularjs/1.5.8/angular.js"></script>
+	<script	src="./resources/js/angularjs/1.5.8/angular-route.js"></script>
+	<script	src="./resources/js/angularjs/1.5.8/angular-cookies.js"></script>
+</head>
+<body>
+
+	<div >	
+		<a href="#/login">Log in</a>
+		<a href="#/viewUrls">View Urls</a><br>
+		<div ng-view></div>
+
+		<script src="./resources/app/app.module.js"></script>
+		<script src="./resources/app/app.config.js"></script>
+		<script	src="./resources/app/view-urls/view-urls.module.js"></script>
+		<script	src="./resources/app/view-urls/view-urls.component.js"></script>
+		<script	src="./resources/app/login/login.module.js"></script>
+		<script	src="./resources/app/login/login.component.js"></script>
+		<script	src="./resources/app/url/url.module.js"></script>
+		<script	src="./resources/app/url/url.component.js"></script>
+		<script	src="./resources/app/tag-urls/tag-urls.module.js"></script>
+		<script	src="./resources/app/tag-urls/tag-urls.component.js"></script>
+
+	</div>
+	
+</body>
+</html>

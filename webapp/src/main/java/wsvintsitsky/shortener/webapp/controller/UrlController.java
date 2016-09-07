@@ -1,7 +1,6 @@
 package wsvintsitsky.shortener.webapp.controller;
 
 import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +28,6 @@ public class UrlController {
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
 	public ErrorInfo handleResourceNotFoundException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
@@ -45,7 +42,14 @@ public class UrlController {
 	}
 
 	@RequestMapping(value = "/{shortUrl}.info", method = RequestMethod.GET)
-	public Url returnUrlWithTags(HttpServletRequest request, HttpServletResponse response, @PathVariable String shortUrl) {
+	public void redirectToInfo(HttpServletResponse response,
+			@PathVariable String shortUrl) throws IOException {
+		String redirect = String.format("http://192.168.100.3:8087/shortener-web/#/info/%s", shortUrl);
+		response.sendRedirect(redirect);
+	}
+	
+	@RequestMapping(value = "/info/{shortUrl}", method = RequestMethod.GET)
+	public Url getUrlWithTags(@PathVariable String shortUrl) throws IOException {
 		Url url = urlService.getUrlWithTags(shortUrl);
 		url.setAccount(null);
 		for (Tag tag : url.getTags()) {

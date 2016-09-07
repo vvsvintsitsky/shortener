@@ -88,5 +88,10 @@ public class UrlServiceImpl implements UrlService {
 		urlDao.update(url);
 		return url.getLongUrl();
 	}
+
+	@Override
+	public List<Url> getUrlsWithTagsByAccountId(Long accountId) {
+		return urlDao.getUrlsWithTagsByAccountId(accountId);
+	}
 	
 }

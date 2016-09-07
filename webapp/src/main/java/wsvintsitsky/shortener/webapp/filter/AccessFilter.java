@@ -9,23 +9,34 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 
 public class AccessFilter implements Filter {
 
 	private String secret;
 
+	private Logger LOGGER = LoggerFactory.getLogger(AccessFilter.class);
+
+	@Autowired
+	private AccountService accountService;
+	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		secret = ConfigurationManager.getProperty("jwt.encoding.secret");
+		SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
 	}
 
 	@Override
@@ -33,37 +44,38 @@ public class AccessFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		String jwtName = ConfigurationManager.getProperty("jwt.name");
-		Cookie[] cookies = httpRequest.getCookies();
-		Date date = new Date();
 		String redirect = request.getServletContext().getContextPath();
+		Date date = new Date();
+		String jwtName = ConfigurationManager.getProperty("jwt.name");
+		String jwt = httpRequest.getHeader(jwtName);
 		Claims claims = null;
-		if (cookies == null) {
+		if (jwt != null) {
+			try {
+				claims = parseJWT(jwt);
+			} catch (JwtException ex) {
+				httpResponse.sendRedirect(redirect);
+				LOGGER.error("bad jwt");
+				return;
+			}
+			if (claims.getExpiration().before(date)) {
+				httpResponse.sendRedirect(redirect);
+				LOGGER.error("jwt expired");
+				return;
+			}
+			Long accountId = Long.valueOf(claims.get("usr").toString());
+			if(accountId == null) {
+				httpResponse.sendRedirect(redirect);
+				LOGGER.error("no user in jwt");
+				return;
+			}
+			httpRequest.setAttribute("accountId", accountId);
+			chain.doFilter(httpRequest, httpResponse);
+			return;
+		} else {
+			LOGGER.error("no jwt");
 			httpResponse.sendRedirect(redirect);
 			return;
 		}
-		for (Cookie cookie : cookies) {
-			if (!cookie.getName().equals(jwtName)) {
-				continue;
-			} else {
-				try {
-					claims = parseJWT(cookie.getValue());
-				} catch (JwtException ex) {
-					cookie.setMaxAge(0);
-					httpResponse.sendRedirect(redirect);
-					return;
-				}
-				if (claims.getExpiration().before(date)) {
-					cookie.setMaxAge(0);
-					httpResponse.sendRedirect(redirect);
-					return;
-				}
-				chain.doFilter(httpRequest, httpResponse);
-				return;
-			}
-		}
-		httpResponse.sendRedirect(redirect);
-		return;
 	}
 
 	@Override
