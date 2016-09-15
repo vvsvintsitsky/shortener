@@ -21,6 +21,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 
@@ -54,25 +55,23 @@ public class AccessFilter implements Filter {
 				claims = parseJWT(jwt);
 			} catch (JwtException ex) {
 				httpResponse.sendRedirect(redirect);
-				LOGGER.error("bad jwt");
 				return;
 			}
 			if (claims.getExpiration().before(date)) {
 				httpResponse.sendRedirect(redirect);
-				LOGGER.error("jwt expired");
 				return;
 			}
-			Long accountId = Long.valueOf(claims.get("usr").toString());
-			if(accountId == null) {
+			String email = claims.get("eml").toString();
+			String password = claims.get("pwd").toString();
+			if(email == null || password == null) {
 				httpResponse.sendRedirect(redirect);
-				LOGGER.error("no user in jwt");
 				return;
 			}
-			httpRequest.setAttribute("accountId", accountId);
+			Account account = accountService.getByEmailAndPassword(email, password);
+			httpRequest.setAttribute("accountId", account.getId());
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 		} else {
-			LOGGER.error("no jwt");
 			httpResponse.sendRedirect(redirect);
 			return;
 		}

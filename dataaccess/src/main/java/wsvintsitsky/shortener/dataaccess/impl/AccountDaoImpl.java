@@ -36,7 +36,14 @@ public class AccountDaoImpl extends AbstractDaoImpl<Account, Long> implements Ac
 		cq.where(cb.and(emailCondition, passwordCondition));
 		
 		TypedQuery<Account> q = em.createQuery(cq);
-		return q.getSingleResult();
+		List<Account> accounts = q.getResultList();
+		if(accounts.size() == 0) {
+			return null;
+		} else if (accounts.size() == 1) {
+			return accounts.get(0);
+		} else {
+			throw new IllegalStateException("more than 1 account found");
+		}
 	}
 
 	@Override

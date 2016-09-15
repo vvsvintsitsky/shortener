@@ -3,7 +3,6 @@ package wsvintsitsky.shortener.service;
 import java.util.List;
 
 import wsvintsitsky.shortener.datamodel.Tag;
-import wsvintsitsky.shortener.datamodel.Url;
 
 public interface TagService {
 
@@ -18,6 +17,4 @@ public interface TagService {
 	void deleteAll();
 	
 	Tag getTagWithUrls(String tagDescription);
-
-	Url updateUrlsTags(Long urlId, List<String> tagDescriptions);
 }

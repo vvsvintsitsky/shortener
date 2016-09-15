@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('viewUrls', []);
+angular.module('viewUrls', ['core.url']);

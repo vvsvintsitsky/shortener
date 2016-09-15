@@ -35,7 +35,14 @@ public class TagDaoImpl extends AbstractDaoImpl<Tag, Long> implements TagDao {
 		cq.where(tagDescriptionCondition);
 		
 		TypedQuery<Tag> q = em.createQuery(cq);
-		return q.getSingleResult();
+		List<Tag> tags = q.getResultList();
+		if(tags.size() == 0) {
+			return null;
+		} else if (tags.size() == 1) {
+			return tags.get(0);
+		} else {
+			throw new IllegalStateException("More than one tag found");
+		}
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class MailSendingServiceImpl implements MailSendingService {
 		mailSender.start();
 	}
 
-	public class MailSender extends Thread {
+	private class MailSender extends Thread {
 
 		private String from;
 		private String userId;

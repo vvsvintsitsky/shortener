@@ -2,14 +2,16 @@ angular.
 	module('tagUrls').
 		component('tagUrls', {
 			templateUrl: './resources/app/tag-urls/tag-urls.template.html',
-			controller: ['$http', '$routeParams',
-				function TagUrlsController($http, $routeParams) {
+			controller: ['$scope', '$http', '$routeParams', 'tagService',
+				function TagUrlsController($scope, $http, $routeParams, tagService) {
 					var self = this;
-					var location = "http://192.168.100.3:8087/shortener-webapp-1.0.0/tag/" + $routeParams.tagDescription;
-					$http.get(location).then(function successCallback(response) {
-						self.tag = response.data;
-					}, function errorCallback(response) {
-						alert('error');
+					
+					tagService.getUrlsByTag($routeParams.tagDescription).then(function(data) {
+						if(data.ex == null) {
+							self.tag = data;
+						} else {
+							$scope.$broadcast('failureEvent', data);
+						}
 					});
 				}
 			]

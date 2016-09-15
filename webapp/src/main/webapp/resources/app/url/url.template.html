@@ -1,28 +1,27 @@
 <div>
 	<div>
-		Short URL:  
-		<a href="{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + $ctrl.url.shortUrl }}">
-			{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + $ctrl.url.shortUrl }}</a>
+		Short URL: <a
+			href="{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + $ctrl.url.shortUrl }}">
+			{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' +
+			$ctrl.url.shortUrl }}</a>
 	</div>
 	<div>
-		Original URL: 
-		<a href="{{ $ctrl.url.longUrl }}">
-			{{ $ctrl.url.longUrl }}
-		</a>
+		Original URL: <a href="{{ $ctrl.url.longUrl }}"> {{
+			$ctrl.url.longUrl }} </a>
 	</div>
+	<div>Visited: {{ $ctrl.url.visited }}</div>
 	<div>
-		Visited: {{ $ctrl.url.visited }}
-	</div>
-	<span ng-repeat="tag in $ctrl.url.tags">
-		<a href="#/tag/{{tag.description}}">{{tag.description}}</a> 
-		<span
-			ng-click="$ctrl.shout(tag)">
-			X
+		Tags: <span ng-repeat="tag in $ctrl.url.tags"> <a
+			href="#/tag/{{tag.description}}">{{tag.description}}</a> <span
+			ng-show="$ctrl.isLoggedIn" ng-click="$ctrl.removeTag(tag)"> X
 		</span>
-	</span>
-	<div>
-		<input type="text" ng-model="tgDscrptn"/>
-		<button type="button" ng-click="$ctrl.addTag(tgDscrptn)">Add</button><br/>
+		</span>
+	</div>
+	<div ng-show="$ctrl.isLoggedIn">
+		<input type="text" ng-model="tgDscrptn" />
+		<button type="button" ng-click="$ctrl.addTag(tgDscrptn)">Add</button>
+		<br />
 		<button type="button" ng-click="$ctrl.updateUrl()">Save</button>
 	</div>
+	<feedback-panel></feedback-panel>
 </div>

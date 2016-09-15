@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('url', []);
+angular.module('url', ['core.url', 'core.tag']);

@@ -8,7 +8,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import wsvintsitsky.shortener.dataaccess.AccountDao;
+import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.dataaccess.UrlDao;
+import wsvintsitsky.shortener.datamodel.Account;
+import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
 
@@ -18,6 +22,12 @@ public class UrlServiceImpl implements UrlService {
 	@Inject
 	private UrlDao urlDao;
 	
+	@Inject
+	private TagDao tagDao;
+	
+	@Inject
+	private AccountDao accountDao;
+	
 	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
 	@Override
@@ -25,6 +35,7 @@ public class UrlServiceImpl implements UrlService {
 	public void saveOrUpdate(Url url) {
 		if (url.getId() == null) {
 			url.setShortUrl(shortenUrl(url.getLongUrl()));
+			url.setVisited(0L);
 			urlDao.insert(url);
 		} else {
 			urlDao.update(url);
@@ -90,8 +101,66 @@ public class UrlServiceImpl implements UrlService {
 	}
 
 	@Override
-	public List<Url> getUrlsWithTagsByAccountId(Long accountId) {
-		return urlDao.getUrlsWithTagsByAccountId(accountId);
+	public List<Url> getUrlsByAccountId(Long accountId) {
+		return urlDao.getUrlsByAccountId(accountId);
+	}
+
+	@Override
+	public boolean checkOwnership(Long accountId, String shortUrl) {
+		return urlDao.checkOwnership(accountId, shortUrl) != null;
+	}
+	
+	@Override
+	@Transactional
+	public Url updateUrlsTags(Long accountId, String shortUrl, List<String> tagDescriptions) {
+		Url url = urlDao.checkOwnership(accountId, shortUrl);
+		if(url == null) {
+			return null;
+		}
+		List<Tag> existingTags = tagDao.getExistingTags(tagDescriptions);
+		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
+		insertNewTags(tagDescriptions, existingTags);
+		url.setTags(existingTags);
+		return urlDao.update(url);
+	}
+	
+	@Override
+	@Transactional
+	public Url createUrl(Long accountId, String longUrl, String description, List<String> tagDescriptions) {
+		Url url = new Url();
+		Account account = accountDao.get(accountId);
+		url.setAccount(account);
+		List<Tag> existingTags = tagDao.getExistingTags(tagDescriptions);
+		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
+		insertNewTags(tagDescriptions, existingTags);
+		url.setTags(existingTags);
+		url.setLongUrl(longUrl);
+		url.setDescription(description);
+		url.setShortUrl(shortenUrl(url.getLongUrl()));
+		url.setVisited(0L);
+		url = urlDao.insert(url);
+		return url;
+	}
+
+	private void insertNewTags(List<String> tagDescriptions, List<Tag> existingTags) {
+		Tag tag;
+		for (String tagDescription : tagDescriptions) {
+			tag = new Tag();
+			tag.setDescription(tagDescription);
+			tagDao.insert(tag);
+			existingTags.add(tag);
+		}
+
+	}
+
+	private void removeExistingTagsFromDescriptions(List<String> tagDescriptions, List<Tag> existingTags) {
+		boolean exists;
+		for (Tag existingTag : existingTags) {
+			exists = tagDescriptions.contains(existingTag.getDescription());
+			if (exists) {
+				tagDescriptions.remove(existingTag.getDescription());
+			}
+		}
 	}
 	
 }

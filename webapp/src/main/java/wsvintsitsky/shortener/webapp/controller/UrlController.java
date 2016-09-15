@@ -17,7 +17,7 @@ import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.error.ErrorInfo;
-import wsvintsitsky.shortener.webapp.error.ResourceNotFoundException;
+import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
 
 @RestController
 @RequestMapping(value = "/")
@@ -26,7 +26,7 @@ public class UrlController {
 	@Autowired
 	private UrlService urlService;
 
-	@ExceptionHandler(ResourceNotFoundException.class)
+	@ExceptionHandler(EntityNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ErrorInfo handleResourceNotFoundException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
@@ -36,7 +36,10 @@ public class UrlController {
 	public void redirect(HttpServletResponse response, @PathVariable String shortUrl) throws IOException {
 		String url = urlService.getLongUrlByShortUrl(shortUrl);
 		if (url == null) {
-			throw new ResourceNotFoundException();
+			throw new EntityNotFoundException("No such URL found");
+		}
+		if(!url.startsWith("http")) {
+			url = "http://" + url;
 		}
 		response.sendRedirect(url);
 	}
@@ -51,6 +54,9 @@ public class UrlController {
 	@RequestMapping(value = "/info/{shortUrl}", method = RequestMethod.GET)
 	public Url getUrlWithTags(@PathVariable String shortUrl) throws IOException {
 		Url url = urlService.getUrlWithTags(shortUrl);
+		if (url == null) {
+			throw new EntityNotFoundException("No such URL found");
+		}
 		url.setAccount(null);
 		for (Tag tag : url.getTags()) {
 			tag.setUrls(null);

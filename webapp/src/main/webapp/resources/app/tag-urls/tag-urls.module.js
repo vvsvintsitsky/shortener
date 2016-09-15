@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('tagUrls', []);
+angular.module('tagUrls', ['core.tag']);

@@ -20,6 +20,11 @@ public interface UrlService {
 
 	String getLongUrlByShortUrl(String shortUrl);
 
-	List<Url> getUrlsWithTagsByAccountId(Long accountId);
+	List<Url> getUrlsByAccountId(Long accountId);
 
+	boolean checkOwnership(Long accountId, String shortUrl);
+	
+	Url updateUrlsTags(Long accountId, String shortUrl, List<String> tagDescriptions);
+	
+	Url createUrl(Long accountId, String longUrl, String description, List<String> tagDescriptions);
 }

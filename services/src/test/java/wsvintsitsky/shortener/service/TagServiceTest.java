@@ -81,7 +81,7 @@ public class TagServiceTest {
 			incomingTagDescriptions.add(tag2.getDescription());
 		}
 		incomingTagDescriptions.add("newTagD");
-		tagService.updateUrlsTags(url.getId(), incomingTagDescriptions);
+		urlService.updateUrlsTags(account.getId(), url.getShortUrl(), incomingTagDescriptions);
 	}
 	
 	private void wipeDB() {
