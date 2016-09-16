@@ -1,9 +1,18 @@
 package wsvintsitsky.shortener.webapp.test;
 
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -11,11 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
@@ -23,13 +28,14 @@ import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
+import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:web-applicationContext-test.xml" })
 @WebAppConfiguration
-public class UrlControllerTest {
+public class LoginControllerTest {
 
 	private MockMvc mockMvc;
 
@@ -91,37 +97,37 @@ public class UrlControllerTest {
 	}
 
 	@Test
-	public void testGetUrlWithTags() throws Exception {
-		Url url = urlService.getAll().get(0);
-		mockMvc.perform(get("/info/" + url.getShortUrl())).andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(url.getId().intValue())))
-				.andExpect(jsonPath("$.longUrl", is(url.getLongUrl())))
-				.andExpect(jsonPath("$.shortUrl", is(url.getShortUrl())))
-				.andExpect(jsonPath("$.visited", is(url.getVisited().intValue())))
-				.andExpect(jsonPath("$.description", is(url.getDescription())));
-	}
+	public void testLogin() throws Exception {
+		Account account = accountService.getAll().get(0);
+		AccountWeb accountWeb = new AccountWeb();
+		ObjectMapper mapper = new ObjectMapper();
 
-	@Test
-	public void testRedirect() throws Exception {
-		Url url = urlService.getAll().get(0);
-		String redirect;
-		if (!url.getLongUrl().startsWith("http")) {
-			redirect = "http://" + url.getLongUrl();
-		} else {
-			redirect = url.getLongUrl();
-		}
-		mockMvc.perform(get("/fakeUrl")).andExpect(status().isNotFound()).andExpect(jsonPath("$.ex", is("No such URL found")));
-
-		mockMvc.perform(get("/" + url.getShortUrl())).andExpect(status().isMovedTemporarily())
-				.andExpect(redirectedUrl(redirect));
-	}
-	
-	@Test
-	public void testRedirectToInfo() throws Exception {
-		Url url = urlService.getAll().get(0);
-		String redirect = String.format("%s%s", ConfigurationManager.getProperty("path.redirect.info"), url.getShortUrl());
+		byte jsonObject[] = mapper.writeValueAsBytes(accountWeb);
+		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
 		
-		mockMvc.perform(get(String.format("/%s.info", url.getShortUrl()))).andExpect(status().isMovedTemporarily())
-		.andExpect(redirectedUrl(redirect));
+		accountWeb.setEmail(account.getEmail());
+		jsonObject = mapper.writeValueAsBytes(accountWeb);
+		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+
+		accountWeb.setEmail(null);
+		accountWeb.setPassword(account.getPassword());
+		jsonObject = mapper.writeValueAsBytes(accountWeb);
+		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+
+		accountWeb.setEmail("_" + account.getEmail());
+		accountWeb.setPassword(account.getPassword());
+		jsonObject = mapper.writeValueAsBytes(accountWeb);
+		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isNotFound()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+		
+		accountWeb.setEmail(account.getEmail());
+		accountWeb.setPassword(account.getPassword());
+		jsonObject = mapper.writeValueAsBytes(accountWeb);
+		String jwtName = ConfigurationManager.getProperty("jwt.name");
+//		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+//				.andExpect(status().isOk()).andExpect(header(jwtName), );
 	}
 }

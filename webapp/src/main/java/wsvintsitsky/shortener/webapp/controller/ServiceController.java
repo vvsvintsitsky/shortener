@@ -38,13 +38,13 @@ public class ServiceController {
 	}
 	
 	@ExceptionHandler(EntityNotFoundException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ErrorInfo handleEntityNotFoundException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public List<Url> getAccsUrls(HttpServletRequest request) {
+	public List<Url> getAccountsUrls(HttpServletRequest request) {
 		Long accountId = (Long) request.getAttribute("accountId");
 		List<Url> urls = urlService.getUrlsByAccountId(accountId);
 		for (Url url : urls) {

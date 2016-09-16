@@ -28,7 +28,7 @@ public class UrlDaoImpl extends AbstractDaoImpl<Url, Long> implements UrlDao {
 	public Url getUrlWithTags(String shortUrl) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Url> cq = cb.createQuery(Url.class);
+		CriteriaQuery<Url> cq = cb.createQuery(Url.class).distinct(true);
 		Root<Url> from = cq.from(Url.class);
 
 		from.fetch(Url_.tags, JoinType.LEFT);

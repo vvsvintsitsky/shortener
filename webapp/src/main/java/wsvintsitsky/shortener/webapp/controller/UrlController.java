@@ -17,6 +17,7 @@ import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.error.ErrorInfo;
+import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
 
 @RestController
@@ -47,7 +48,7 @@ public class UrlController {
 	@RequestMapping(value = "/{shortUrl}.info", method = RequestMethod.GET)
 	public void redirectToInfo(HttpServletResponse response,
 			@PathVariable String shortUrl) throws IOException {
-		String redirect = String.format("http://192.168.100.3:8087/shortener-web/#/info/%s", shortUrl);
+		String redirect = String.format("%s%s", ConfigurationManager.getProperty("path.redirect.info"), shortUrl);
 		response.sendRedirect(redirect);
 	}
 	

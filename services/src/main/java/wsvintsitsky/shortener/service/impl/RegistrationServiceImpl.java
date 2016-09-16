@@ -27,4 +27,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 		mailSendingService.sendRegisteredEmail(account, mailFrom, mailUserId, mailPassword, messageSubject, messageText);
 	}
 
+	@Override
+	public void confirm(String confirmationString) {
+		
+	}
+
 }

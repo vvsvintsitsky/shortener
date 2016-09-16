@@ -44,4 +44,10 @@ public class RegistrationController {
 		}
 		registrationService.register(login, password, from, userId, emailPassword, "complete registration", "complete registration");
 	}
+	
+	@RequestMapping(value = "/confirm", method = RequestMethod.POST)
+	public void confirm(HttpServletRequest request) {
+		String confirmationString = request.getParameter("cs");
+		registrationService.confirm(confirmationString);
+	}
 }

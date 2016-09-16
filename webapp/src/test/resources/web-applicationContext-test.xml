@@ -22,7 +22,12 @@
 		http://www.springframework.org/schema/security/spring-security.xsd">
 
 	<import resource="web-applicationContext.xml" />
-	<import resource="service-context-test.xml" />
+	
+	<bean id="dataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close" p:driverClassName="org.postgresql.Driver"
+		p:url="jdbc:postgresql://localhost:5432/shortener" p:username="postgres"
+		p:password="7muCC" p:schema="test" />
 
 	<mvc:annotation-driven />
 	<context:component-scan base-package="wsvintsitsky.shortener.webapp.controller" />

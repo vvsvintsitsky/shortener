@@ -63,8 +63,7 @@ public class UrlServiceImpl implements UrlService {
 	public void deleteAll() {
 		urlDao.deleteAll();
 	}
-
-
+	
 	private String shortenUrl(String longUrl) {
 		double id1 = (double)(longUrl.hashCode() + (double)4*2147483647);
 		int z;
@@ -87,9 +86,8 @@ public class UrlServiceImpl implements UrlService {
 	@Transactional
 	public String getLongUrlByShortUrl(String shortUrl) {
 		Url url = null;
-		try{
-			url = urlDao.getUrlByShortUrl(shortUrl);
-		} catch (NoResultException ex) {
+		url = urlDao.getUrlByShortUrl(shortUrl);
+		if(url == null) {
 			return null;
 		}
 		

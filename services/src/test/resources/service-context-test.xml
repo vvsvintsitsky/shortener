@@ -15,7 +15,7 @@
 	    http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
 	<import resource="service-context.xml" />
-
+	
 	<bean id="dataSource"
 		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
 		destroy-method="close" p:driverClassName="org.postgresql.Driver"

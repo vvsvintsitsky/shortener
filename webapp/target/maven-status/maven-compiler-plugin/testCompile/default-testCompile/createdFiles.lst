@@ -1,1 +1,2 @@
-wsvintsitsky\shortener\webapp\test\RegistrationControllerTest.class
+wsvintsitsky\shortener\webapp\test\database\filler\DatabaseFiller.class
+wsvintsitsky\shortener\webapp\test\UrlControllerTest.class
