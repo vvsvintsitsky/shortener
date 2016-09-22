@@ -9,7 +9,7 @@ angular
 							'$scope',
 							'$location',
 							'authenticationService',
-							function LoginController($rootScope, $scope, $location,
+							function LoginPanelController($rootScope, $scope, $location,
 									authenticationService) {
 								this.login = function() {
 									var result = authenticationService

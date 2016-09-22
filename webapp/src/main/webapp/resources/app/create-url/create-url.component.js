@@ -14,7 +14,7 @@ angular
 								self.tags = [];
 
 								self.createUrl = function() {
-									if (creationCondition()) {
+									if (self.urlCreationCondition()) {
 										urlService
 												.createUrl(self.longUrl,
 														self.description,
@@ -39,15 +39,15 @@ angular
 								self.addTag = function(tgDscrptn) {
 									if (tgDscrptn != null && tgDscrptn != "") {
 										tagService.addTag(self.tags, tgDscrptn);
+										$scope.tgDscrptn = null;
 									}
-									$scope.tgDscrptn = null;
 								};
 
 								self.removeTag = function(tag) {
 									tagService.removeTag(self.tags, tag);
 								};
 
-								function creationCondition() {
+								self.urlCreationCondition = function() {
 									return (self.tags.length != 0)
 											&& (self.longUrl != null)
 											&& (self.longUrl != "")

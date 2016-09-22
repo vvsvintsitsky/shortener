@@ -8,23 +8,23 @@ angular
 							'$scope',
 							'$location',
 							'registrationService',
-							function RegistrationController($scope, $location,
-									registrationService) {
+							function RegistrationPanelController($scope,
+									$location, registrationService) {
 								var self = this;
 
 								self.register = function() {
-									if (this.email != null && this.email != ""
-											&& this.password != null
-											&& this.password != "") {
+									if (self.validateCredentials()) {
 										registrationService
 												.register(this.email,
 														this.password)
 												.then(
 														function(data) {
 															if (data.ex == null) {
-																var notification = "Email with activation instructions has been sent to " + self.email;
+																var notification = data
+																		+ self.email;
 																alert(notification);
-																$location.path("/login");
+																$location
+																		.path("/login");
 															} else {
 																$scope
 																		.$broadcast(
@@ -35,5 +35,12 @@ angular
 									}
 
 								};
+
+								self.validateCredentials = function() {
+									return self.email != null
+											&& self.email != ""
+											&& self.password != null
+											&& self.password != "";
+								}
 							} ]
 				});

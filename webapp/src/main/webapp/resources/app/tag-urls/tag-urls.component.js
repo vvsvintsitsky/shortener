@@ -5,8 +5,8 @@ angular.
 			controller: ['$scope', '$http', '$routeParams', 'tagService',
 				function TagUrlsController($scope, $http, $routeParams, tagService) {
 					var self = this;
-					
-					tagService.getUrlsByTag($routeParams.tagDescription).then(function(data) {
+					self.tags = [];
+					tagService.getTagWithUrls($routeParams.tagDescription).then(function(data) {
 						if(data.ex == null) {
 							self.tag = data;
 						} else {

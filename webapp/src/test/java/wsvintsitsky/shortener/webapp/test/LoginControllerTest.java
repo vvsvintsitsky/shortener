@@ -1,11 +1,10 @@
 package wsvintsitsky.shortener.webapp.test;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-
 import java.util.List;
 
 import org.junit.Before;
@@ -17,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -30,6 +30,7 @@ import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
+import wsvintsitsky.shortener.webapp.security.WebTokenManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -100,34 +101,40 @@ public class LoginControllerTest {
 	public void testLogin() throws Exception {
 		Account account = accountService.getAll().get(0);
 		AccountWeb accountWeb = new AccountWeb();
+		AccountWeb returnedAccountWeb;
 		ObjectMapper mapper = new ObjectMapper();
-
+		MvcResult mvcResult;
+		String jwtName = ConfigurationManager.getProperty("jwt.name");
+		
 		byte jsonObject[] = mapper.writeValueAsBytes(accountWeb);
-		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
 		
 		accountWeb.setEmail(account.getEmail());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
-		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
 
 		accountWeb.setEmail(null);
 		accountWeb.setPassword(account.getPassword());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
-		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
 
 		accountWeb.setEmail("_" + account.getEmail());
 		accountWeb.setPassword(account.getPassword());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
-		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isNotFound()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isUnauthorized()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
 		
 		accountWeb.setEmail(account.getEmail());
 		accountWeb.setPassword(account.getPassword());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
-		String jwtName = ConfigurationManager.getProperty("jwt.name");
-//		mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-//				.andExpect(status().isOk()).andExpect(header(jwtName), );
+		mvcResult = mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
+				.andExpect(status().isOk()).andReturn();
+		
+		returnedAccountWeb = WebTokenManager.parseJWT(mvcResult.getResponse().getHeader(jwtName));
+		assertEquals("Returned login", accountWeb.getEmail(), returnedAccountWeb.getEmail());
+		assertEquals("Returned password", accountWeb.getPassword(), returnedAccountWeb.getPassword());
 	}
 }

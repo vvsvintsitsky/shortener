@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,6 +33,11 @@ public class UrlServiceTest {
 
 	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceTest.class);
 
+	@Before
+	public void before() {
+		wipeDB();
+	}
+	
 	@Test
 	public void testInsert() {
 		wipeDB();

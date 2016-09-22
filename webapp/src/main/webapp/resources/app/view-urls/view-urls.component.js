@@ -5,6 +5,7 @@ angular.
 			controller: ['$scope', '$http', '$cookies', 'urlService',
 				function ViewUrlsController($scope, $http, $cookies, urlService) {
 					var self = this;
+					self.urls = [];
 					$scope.$on('urlCreationEvent', function(event, data) {
 						self.urls.push(data);
 					});

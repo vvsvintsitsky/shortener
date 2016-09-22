@@ -13,11 +13,11 @@
 	<div>
 		Tags: <span ng-repeat="tag in $ctrl.url.tags"> <a
 			href="#/tag/{{tag.description}}">{{tag.description}}</a> <span
-			ng-show="$ctrl.isLoggedIn" ng-click="$ctrl.removeTag(tag)"> X
+			ng-show="$ctrl.ownersihp" ng-click="$ctrl.removeTag(tag)"> X
 		</span>
 		</span>
 	</div>
-	<div ng-show="$ctrl.isLoggedIn">
+	<div ng-show="$ctrl.ownership">
 		<input type="text" ng-model="tgDscrptn" />
 		<button type="button" ng-click="$ctrl.addTag(tgDscrptn)">Add</button>
 		<br />

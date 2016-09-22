@@ -4,23 +4,28 @@ angular.module('url').component(
 			templateUrl : './resources/app/url/url.template.html',
 			controller : [
 					'$scope',
-					'$cookies',
 					'$routeParams',
 					'urlService',
 					'tagService',
-					function UrlController($scope, $cookies, $routeParams, urlService,
-							tagService) {
+					'authenticationService',
+					function UrlController($scope, $routeParams, urlService,
+							tagService, authenticationService) {
 						var self = this;
-						self.isLoggedIn = $cookies.get('Authentication');
+						authenticationService.checkOwnership(
+								$routeParams.urlToView).then(function(data) {
+							self.ownership = data;
+						});
 
-						urlService.getInfo($routeParams.urlToView).then(
-								function(data) {
-									if(data.ex == null) {
-										self.url = data;
-									} else {
-										$scope.$broadcast('failureEvent', data);
-									}
-								});
+						urlService.getInfo($routeParams.urlToView)
+								.then(
+										function(data) {
+											if (data.ex == null) {
+												self.url = data;
+											} else {
+												$scope.$broadcast(
+														'failureEvent', data);
+											}
+										});
 
 						self.removeTag = function(tag) {
 							tagService.removeTag(self.url.tags, tag);
@@ -39,7 +44,7 @@ angular.module('url').component(
 							}
 						}
 
-						function updateCondition() {
+						self.updateCondition = function() {
 							return self.url.tags.length != 0;
 						}
 					} ]

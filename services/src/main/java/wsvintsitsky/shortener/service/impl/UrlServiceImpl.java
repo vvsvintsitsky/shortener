@@ -3,7 +3,6 @@ package wsvintsitsky.shortener.service.impl;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;

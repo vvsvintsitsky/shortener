@@ -13,7 +13,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 
@@ -24,7 +23,7 @@ public class WebTokenManager {
 	private WebTokenManager() {
 	}
 
-	public static String createJWT(Account account) {
+	public static String createJWT(String email, String password) {
 		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 		long nowMillis = System.currentTimeMillis();
 		long ttlMillis = Long.parseLong(ConfigurationManager.getProperty("jwt.encoding.ttlmillis"));
@@ -32,8 +31,8 @@ public class WebTokenManager {
 		Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		map.put("eml", account.getEmail());
-		map.put("pwd", account.getPassword());
+		map.put("eml", email);
+		map.put("pwd", password);
 		JwtBuilder builder = Jwts.builder().setClaims(Jwts.claims(map)).signWith(signatureAlgorithm, signingKey);
 		if (ttlMillis >= 0) {
 			long expMillis = nowMillis + ttlMillis;

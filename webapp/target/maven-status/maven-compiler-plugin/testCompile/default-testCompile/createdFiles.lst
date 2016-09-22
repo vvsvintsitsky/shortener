@@ -1,2 +1,6 @@
+wsvintsitsky\shortener\webapp\test\TagControllerTest.class
+wsvintsitsky\shortener\webapp\test\RegistrationControllerTest.class
 wsvintsitsky\shortener\webapp\test\database\filler\DatabaseFiller.class
 wsvintsitsky\shortener\webapp\test\UrlControllerTest.class
+wsvintsitsky\shortener\webapp\test\LoginControllerTest.class
+wsvintsitsky\shortener\webapp\test\ServiceControllerTest.class

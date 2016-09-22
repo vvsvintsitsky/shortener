@@ -51,7 +51,7 @@ public class LoginController {
 		if(account == null) {
 			throw new EntityNotFoundException("Incorrect login or password");
 		}
-		String jwt = WebTokenManager.createJWT(account);
+		String jwt = WebTokenManager.createJWT(account.getEmail(), account.getPassword());
 		String jwtName = ConfigurationManager.getProperty("jwt.name");
 		response.setHeader(jwtName, jwt);
 	}

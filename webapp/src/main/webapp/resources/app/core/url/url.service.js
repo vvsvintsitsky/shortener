@@ -3,12 +3,21 @@ angular.
 		factory('urlService',  ['$http', '$cookies', function($http, $cookies) {
 			var service = {};
 			var rootPath = "http://192.168.100.3:8087/shortener-webapp-1.0.0/";
-			var servicePath =  rootPath + "service/";
-			var infoPath = rootPath + "info/";
+			
+			function generateAuthenticationHeader() {
+				var token = $cookies.get('Authentication');
+				var header = {
+					'Authentication' :  token
+				};
+				return header;
+			}
+			
+			service.servicePath =  rootPath + "service/";
+			service.infoPath = rootPath + "info/";
 			
 			service.getInfo = function(shortUrl) {
 				var result =
-				$http.get(infoPath + shortUrl).then(function successCallback(response) {
+				$http.get(service.infoPath + shortUrl).then(function successCallback(response) {
 					return response.data;
 				}, function errorCallback(response) {
 					return response.data;
@@ -22,7 +31,7 @@ angular.
 					'Authentication' :  token
 				};
 				var result =
-					$http.get(servicePath, {
+					$http.get(service.servicePath, {
 						headers : header
 					}).then(function successCallback(response) {
 						return response.data;
@@ -37,7 +46,7 @@ angular.
 				var header = {
 					'Authentication' :  token
 				};
-				var result = $http.put(servicePath, url, {
+				var result = $http.put(service.servicePath, url, {
 					headers : header
 				}).then(function successCallback(response) {
 					return true;
@@ -61,12 +70,12 @@ angular.
 						longUrl: lngUrl,
 						tags: tgs
 				}
-				var result = $http.post(servicePath, url, {
+				var result = $http.post(service.servicePath, url, {
 					headers : header
 				}).then(function successCallback(response) {
 					return response.data
 				}, function errorCallback(response) {
-					return false;
+					return response.data;
 				});
 				return result;
 			}

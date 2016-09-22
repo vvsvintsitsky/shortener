@@ -5,3 +5,5 @@ dataaccess/target/
 datamodel/target/
 services/target/
 webapp/target/
+webapp/src/main/webapp/resources/app/bower_components/
+webapp/src/main/webapp/resources/app/bower_components/angular-animate/.bower.json
