@@ -1,10 +1,10 @@
 CREATE TABLE "account" (
 	"id" serial NOT NULL,
-	"email" character varying(50) NOT NULL,
+	"email" character varying(50) NOT NULL UNIQUE,
 	"password" character varying(50) NOT NULL,
 	"created" TIMESTAMP NOT NULL,
-    "is_notified" BOOLEAN NOT NULL,
-    "is_confirmed" BOOLEAN NOT NULL,
+	"is_notified" BOOLEAN NOT NULL,
+	"is_confirmed" BOOLEAN NOT NULL,
 	CONSTRAINT account_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -51,4 +51,3 @@ ALTER TABLE "url" ADD CONSTRAINT "url_fk0" FOREIGN KEY ("account_id") REFERENCES
 
 ALTER TABLE "url_2_tag" ADD CONSTRAINT "url_2_tag_fk0" FOREIGN KEY ("url_id") REFERENCES "url"("id");
 ALTER TABLE "url_2_tag" ADD CONSTRAINT "url_2_tag_fk1" FOREIGN KEY ("tag_id") REFERENCES "tag"("id");
-
