@@ -22,6 +22,7 @@ import wsvintsitsky.shortener.webapp.security.WebTokenManager;
 
 public class AccessFilter implements Filter {
 
+	@SuppressWarnings("unused")
 	private Logger LOGGER = LoggerFactory.getLogger(AccessFilter.class);
 
 	@Autowired
@@ -43,7 +44,7 @@ public class AccessFilter implements Filter {
 		AccountWeb accountWeb = WebTokenManager.parseJWT(jwt);
 		
 		if (accountWeb != null) {
-			Account account = accountService.getByEmailAndPassword(accountWeb.getEmail(), accountWeb.getPassword());
+			Account account = accountService.getConfirmedUser(accountWeb.getEmail(), accountWeb.getPassword());
 			httpRequest.setAttribute("accountId", account.getId());
 			chain.doFilter(httpRequest, httpResponse);
 			return;

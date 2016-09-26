@@ -20,9 +20,7 @@ angular
 												.then(
 														function(data) {
 															if (data.ex == null) {
-																var notification = data
-																		+ self.email;
-																alert(notification);
+																alert(data.info);
 																$location
 																		.path("/login");
 															} else {

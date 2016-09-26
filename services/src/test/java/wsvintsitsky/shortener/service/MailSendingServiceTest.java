@@ -39,28 +39,12 @@ public class MailSendingServiceTest {
 		account.setEmail("v.v.svintsitsky@gmail.com");
 		accountService.saveOrUpdate(account);
 		
-		String from = "v.v.svintsitsky@gmail.com";
-		String userId = "v.v.svintsitsky";
-		String password = "rSoGnoL40h247";
+		String from = "handmade.shortener@gmail.com";
+		String userId = "handmade.shortener";
+		String password = "zsefb159357";
 		String messageSubject = "TEST SUBJECT";
 		String messageText = "TEST TEXT";
 		mailSendingService.sendRegisteredEmail(account, from, userId, password, messageSubject, messageText);
-	}
-	
-	@Test
-	public void testSendForgottenCredentials() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Account account = databaseFiller.createAccounts(1).get(0);
-		account.setEmail("v.v.svintsitsky@gmail.com");
-		accountService.saveOrUpdate(account);
-		
-		String from = "v.v.svintsitsky@gmail.com";
-		String userId = "v.v.svintsitsky";
-		String password = "rSoGnoL40h247";
-		String messageSubject = "TEST SUBJECT";
-		String messageText = "TEST TEXT";
-		mailSendingService.sendForgottenEmails(from, userId, password);
 	}
 	
 	private void wipeDB() {

@@ -19,15 +19,18 @@
 	</Appenders>
 	<Loggers>
 
-		<Logger name="wsvintsitsky.shortener.service" level="WARN"
+		<Logger name="wsvintsitsky.shortener.dataaccess" level="INFO"
 			additivity="false">
-			<AppenderRef ref="CONSOLE" />
 			<AppenderRef ref="SERVER_LOGFILE" />
 		</Logger>
 
-		<Logger name="wsvintsitsky.shortener.webapp" level="WARN"
+		<Logger name="wsvintsitsky.shortener.service" level="INFO"
 			additivity="false">
-			<AppenderRef ref="CONSOLE" />
+			<AppenderRef ref="SERVER_LOGFILE" />
+		</Logger>
+
+		<Logger name="wsvintsitsky.shortener.webapp" level="INFO"
+			additivity="false">
 			<AppenderRef ref="SERVER_LOGFILE" />
 		</Logger>
 

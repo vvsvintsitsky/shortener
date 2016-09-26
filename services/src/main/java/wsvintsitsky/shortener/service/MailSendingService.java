@@ -6,6 +6,4 @@ public interface MailSendingService {
 
 	void sendRegisteredEmail(Account to, String from, String userId, String password, String messageSubject,
 			String messageText);
-	
-	void sendForgottenEmails(String from, String userId, String password);
 }

@@ -49,9 +49,9 @@ angular.
 				var result = $http.put(service.servicePath, url, {
 					headers : header
 				}).then(function successCallback(response) {
-					return true;
+					return response.data;
 				}, function errorCallback(response) {
-					return false;
+					return response.data;
 				});
 				return result;
 			}

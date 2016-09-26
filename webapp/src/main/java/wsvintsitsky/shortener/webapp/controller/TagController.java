@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.TagService;
-import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
-import wsvintsitsky.shortener.webapp.error.ErrorInfo;
+import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
+import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 
 @RestController
 @RequestMapping(value = "/tag")

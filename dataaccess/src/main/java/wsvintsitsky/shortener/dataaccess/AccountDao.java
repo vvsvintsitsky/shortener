@@ -9,6 +9,8 @@ public interface AccountDao extends AbstractDao<Account, Long> {
 	
 	Account getByEmailAndPassword(String email, String password);
 	
+	Account getConfirmedUser(String email, String password);
+	
 	List<Account> findNotNotified();
 	
 	void deleteNotConfirmed(Date date);

@@ -8,7 +8,6 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.TagDao;
-import wsvintsitsky.shortener.dataaccess.UrlDao;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.service.TagService;
 
@@ -17,9 +16,6 @@ public class TagServiceImpl implements TagService {
 
 	@Inject
 	private TagDao tagDao;
-
-	@Inject
-	UrlDao urlDao;
 
 	@Override
 	@Transactional

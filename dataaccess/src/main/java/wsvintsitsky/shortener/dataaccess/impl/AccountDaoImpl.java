@@ -74,4 +74,27 @@ public class AccountDaoImpl extends AbstractDaoImpl<Account, Long> implements Ac
 		em.createQuery(cd).executeUpdate();
 	}
 
+	@Override
+	public Account getConfirmedUser(String email, String password) {
+		EntityManager em = getEntityManager();
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Account> cq = cb.createQuery(Account.class);
+		Root<Account> from = cq.from(Account.class);
+		
+		Predicate emailCondition = cb.equal(from.get(Account_.email), email);
+		Predicate passwordCondition = cb.equal(from.get(Account_.password), password);
+		Predicate isConfirmedCondition = cb.equal(from.get(Account_.isConfirmed), true);
+		cq.where(cb.and(emailCondition, passwordCondition, isConfirmedCondition));
+		
+		TypedQuery<Account> q = em.createQuery(cq);
+		List<Account> accounts = q.getResultList();
+		if(accounts.size() == 0) {
+			return null;
+		} else if (accounts.size() == 1) {
+			return accounts.get(0);
+		} else {
+			throw new IllegalStateException("more than 1 account found");
+		}
+	}
+
 }

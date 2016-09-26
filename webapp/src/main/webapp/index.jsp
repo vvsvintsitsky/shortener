@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html ng-app="mainApp">
 <head>
-<title>Index Page</title>
+<title>Handmade Shortener</title>
 <link rel="stylesheet" type="text/css"
 	href="./resources/css/stylesheet.css" />
 
@@ -15,7 +15,7 @@
 
 	<div>
 		<menu-panel></menu-panel>
-		<div ng-view></div>
+		<div id="appwindow" ng-view></div>
 		
 		<script src="./resources/app/app.module.js"></script>
 		<script src="./resources/app/app.config.js"></script>

@@ -12,6 +12,8 @@ public interface AccountService {
 	
 	Account getByEmailAndPassword(String email, String password);
 	
+	Account getConfirmedUser(String email, String password);
+	
 	List<Account> getAll();
 	
 	void delete(Long id);

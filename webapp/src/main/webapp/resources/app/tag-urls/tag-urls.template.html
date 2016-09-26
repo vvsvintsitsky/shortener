@@ -1,21 +1,24 @@
-<div>
-	<div>
-		Urls by tag "{{ $ctrl.tag.description }}": 
+<div class="appwindow">
+	<div class="module">
+		<div>Urls by tag "{{ $ctrl.tag.description }}":</div>
+		<table>
+			<tr>
+				<th>Original URL</th>
+				<th>Short URL</th>
+				<th>Visited</th>
+				<th></th>
+			</tr>
+			<tr ng-repeat="url in $ctrl.tag.urls">
+				<td><a href="{{ url.longUrl }}">{{ url.longUrl }}</a></td>
+				<td><a
+					href="{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + url.shortUrl }}">
+						{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' +
+						url.shortUrl }}</a></td>
+				<td>{{ url.visited }}</td>
+				<td><a href="#/info/{{url.shortUrl}}">info</a></td>
+			</tr>
+		</table>
 	</div>
-	<table>
-		<tr>
-			<th>Original URL</th>
-			<th>Short URL</th>
-			<th>Visited</th>
-			<th></th>
-		</tr>
-		<tr ng-repeat="url in $ctrl.tag.urls">
-			<td><a href="{{ url.longUrl }}">{{ url.longUrl }}</a></td>
-			<td><a href="{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + url.shortUrl }}">
-			{{ 'http://192.168.100.3:8087/shortener-webapp-1.0.0/' + url.shortUrl }}</a></td>
-			<td>{{ url.visited }}</td>
-			<td><a href="#/info/{{url.shortUrl}}">info</a></td>
-		</tr>
-	</table>
 	<feedback-panel></feedback-panel>
+
 </div>

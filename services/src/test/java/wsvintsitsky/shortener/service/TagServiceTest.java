@@ -1,10 +1,11 @@
 package wsvintsitsky.shortener.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,57 +32,114 @@ public class TagServiceTest {
 	
 	private Logger LOGGER = LoggerFactory.getLogger(TagServiceTest.class);
 	
+	List<Account> accounts;
+	List<Url> urls;
+	List<Tag> tags;
+
+	@Before
+	public void setUp() {
+		wipeDB();
+		fillDatabase(2, 2);
+	}
+
+	private void fillDatabase(int entityCount, int multiplier) {
+		DatabaseFiller filler = new DatabaseFiller();
+		accounts = filler.createAccounts(entityCount);
+		urls = filler.createUrls(accounts.size() * multiplier);
+		tags = filler.createTags(urls.size() * multiplier);
+		Account account;
+		Url url;
+		Tag tag;
+		int i;
+		int j;
+		int n;
+		int urlStart;
+		int tagStart;
+		for (i = 0; i < entityCount; i++) {
+			account = accounts.get(i);
+			accountService.saveOrUpdate(account);
+			urlStart = i * multiplier;
+			for (j = urlStart; j < urlStart + multiplier; j++) {
+				url = urls.get(j);
+				url.setAccount(account);
+				urlService.saveOrUpdate(url);
+				tagStart = j * multiplier;
+				for (n = tagStart; n < tagStart + multiplier; n++) {
+					tag = tags.get(n);
+					tag.getUrls().add(url);
+					tagService.saveOrUpdate(tag);
+					url.getTags().add(tag);
+				}
+			}
+		}
+	}
+	
 	@Test
 	public void testInsert() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
+		Tag tag = new Tag();
+		tag.setDescription("description");
+		try {
+			tagService.saveOrUpdate(tag);
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
 		
-		Tag tag = databaseFiller.createTags(1).get(0);
-		tagService.saveOrUpdate(tag);
-		tag = tagService.get(tag.getId());
-		if(tag == null) {
-			LOGGER.error("didn't find inserted row");
-			throw(new IllegalArgumentException());
+		if(tags.size() + 1 != tagService.getAll().size()) {
+			logAndThrowExcetion("tag wasn't inserted");
 		}
 	}
 	
 	@Test
 	public void testUpdate() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Tag tag = databaseFiller.createTags(1).get(0);
-		tagService.saveOrUpdate(tag);
-		tag.setDescription("updTag");
-		tagService.saveOrUpdate(tag);
+		Tag tag = tagService.getAll().get(0);
+		tag.setDescription("description");
+		try {
+			tagService.saveOrUpdate(tag);
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
+		
+		if(tags.size() != tagService.getAll().size()) {
+			logAndThrowExcetion("Tag wasn't updated");
+		}
 	}
 	
 	@Test
 	public void testDelete() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Tag tag = databaseFiller.createTags(1).get(0);
-		tagService.saveOrUpdate(tag);
-		tagService.delete(tag.getId());
+		Tag tag = tagService.getAll().get(0);
+		
+		try {
+			tagService.delete(tag.getId());
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
+		
+		if(tags.size() - 1 != tagService.getAll().size()) {
+			logAndThrowExcetion("Tag wasn't deleted");
+		}
 	}
 	
 	@Test
-	public void testGetExistingTags() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		List<Tag> tags = databaseFiller.createTags(2);
-		Account account = databaseFiller.createAccounts(1).get(0);
-		Url url = databaseFiller.createUrls(1).get(0);
-		accountService.saveOrUpdate(account);
-		url.setAccount(account);
-		urlService.saveOrUpdate(url);
-		List<String> incomingTagDescriptions = new ArrayList<String>();
-		for (Tag tag2 : tags) {
-			tag2.getUrls().add(url);
-			tagService.saveOrUpdate(tag2);
-			incomingTagDescriptions.add(tag2.getDescription());
+	public void testTagWithUrls() {
+		Tag tag1 = tags.get(0);
+		for(Url url : tag1.getUrls()) {
+			url.setAccount(null);
+			url.setTags(null);
 		}
-		incomingTagDescriptions.add("newTagD");
-		urlService.updateUrlsTags(account.getId(), url.getShortUrl(), incomingTagDescriptions);
+		Tag tag2 = tagService.getTagWithUrls(tag1.getDescription());
+		for(Url url : tag2.getUrls()) {
+			url.setAccount(null);
+			url.setTags(null);
+		}
+		boolean condition = tag1.getUrls().containsAll(tag2.getUrls()) && tag2.getUrls().containsAll(tag1.getUrls());
+		if(!condition) {
+			logAndThrowExcetion("Tag wasn't deleted");
+		}
+	}
+	
+	private void logAndThrowExcetion(String message) {
+		LOGGER.error(message);
+		throw new IllegalStateException(message);
 	}
 	
 	private void wipeDB() {

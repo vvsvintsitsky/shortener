@@ -37,9 +37,12 @@ angular.module('url').component(
 						}
 
 						self.updateUrl = function() {
-							if (updateCondition()) {
+							if (self.updateCondition()) {
 								urlService.updateUrl(self.url).then(
 										function(data) {
+											if(data.ex == null) {
+												alert(data.info);
+											}
 										});
 							}
 						}

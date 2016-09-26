@@ -1,21 +1,23 @@
 package wsvintsitsky.shortener.service;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
-
 import wsvintsitsky.shortener.datamodel.Account;
+import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.AccountService;
 
-@SuppressWarnings("unused")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class AccountServiceTest {
@@ -29,77 +31,167 @@ public class AccountServiceTest {
 	@Inject
 	private TagService tagService;
 	
+	private Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class);
+	
+	List<Account> accounts;
+	List<Url> urls;
+	List<Tag> tags;
+
+	@Before
+	public void setUp() {
+		wipeDB();
+		fillDatabase(2, 2);
+	}
+
+	private void fillDatabase(int entityCount, int multiplier) {
+		DatabaseFiller filler = new DatabaseFiller();
+		accounts = filler.createAccounts(entityCount);
+		urls = filler.createUrls(accounts.size() * multiplier);
+		tags = filler.createTags(urls.size() * multiplier);
+		Account account;
+		Url url;
+		Tag tag;
+		int i;
+		int j;
+		int n;
+		int urlStart;
+		int tagStart;
+		for (i = 0; i < entityCount; i++) {
+			account = accounts.get(i);
+			accountService.saveOrUpdate(account);
+			urlStart = i * multiplier;
+			for (j = urlStart; j < urlStart + multiplier; j++) {
+				url = urls.get(j);
+				url.setAccount(account);
+				urlService.saveOrUpdate(url);
+				tagStart = j * multiplier;
+				for (n = tagStart; n < tagStart + multiplier; n++) {
+					tag = tags.get(n);
+					tag.getUrls().add(url);
+					tagService.saveOrUpdate(tag);
+					url.getTags().add(tag);
+				}
+			}
+		}
+	}
+	
+	
+	
 	@Test
 	public void testInsert() {		
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Account account = databaseFiller.createAccounts(1).get(0);
-		accountService.saveOrUpdate(account);
+		Account account = new Account();
+		account.setEmail("email");
+		account.setPassword("password");
+		
+		try {
+			accountService.saveOrUpdate(account);
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
+		
+		if(accounts.size() + 1 != accountService.getAll().size()) {
+			logAndThrowExcetion("Account wasn't created");
+		}
 	}
 	
 	@Test
 	public void testGetAll() {
+		if(accounts.size() != accountService.getAll().size()) {
+			logAndThrowExcetion("Not all accounts were loaded");
+		}
+	}
+	
+	@Test
+	public void testDeleteAll() {
 		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();	
-		List<Account> accounts = accountService.getAll();
+		if(accountService.getAll().size() != 0) {
+			logAndThrowExcetion("Not all accounts were deleted");
+		}
 	}
 	
 	@Test
 	public void testFindNotNotified() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		List<Account> accounts = databaseFiller.createAccounts(2);
-		accounts.get(0).setIsNotified(true);
-		for (Account account : accounts) {
-			accountService.saveOrUpdate(account);
+		Account account = accountService.getAll().get(0);
+		account.setIsNotified(true);
+		accountService.saveOrUpdate(account);
+		
+		List<Account> notNotifiedAccounts = accountService.findNotNotified();
+		for (Account account2 : notNotifiedAccounts) {
+			if(account2.getIsNotified() == true) {
+				logAndThrowExcetion("Notified account was loaded");
+			}
 		}
-		accounts = accountService.findNotNotified();
-	}
-	
-	@Test
-	public void testDeleteNotConfirmed() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		List<Account> accounts = databaseFiller.createAccounts(2);
-		Account acc = accounts.get(0);
-		for (Account account : accounts) {
-			accountService.saveOrUpdate(account);
+		if(accounts.size() -1 != notNotifiedAccounts.size()) {
+			logAndThrowExcetion("Not all unnotified accounts were found");
 		}
-		accountService.deleteNotConfirmed();
 	}
 	
 	@Test
 	public void testUpdate() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Account account = databaseFiller.createAccounts(1).get(0);
-		accountService.saveOrUpdate(account);
-		account.setPassword("password");
-		accountService.saveOrUpdate(account);
+		Account account = accountService.getAll().get(0);
+		account.setEmail("email");
+		try {
+			accountService.saveOrUpdate(account);
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
 		
+		if(accounts.size() != accountService.getAll().size()) {
+			logAndThrowExcetion("Account wasn't updated");
+		}
 	}
 	
 	@Test
 	public void testDelete() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		Account account = databaseFiller.createAccounts(1).get(0);
-		accountService.saveOrUpdate(account);
-		accountService.delete(account.getId());
+		Account account = accountService.getAll().get(0);
 		
+		try {
+			accountService.delete(account.getId());
+			logAndThrowExcetion("Account with existing urls was deleted");
+		} catch (PersistenceException ex) {
+			urlService.deleteAll();
+		}
+		
+		try {
+			accountService.delete(account.getId());
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
+		
+		if(accounts.size() - 1 != accountService.getAll().size()) {
+			logAndThrowExcetion("Too many accounts were deleted");
+		}
 	}
 	
 	@Test
 	public void testGetByEmailAndPassword() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		String email = "v.v.svintsitsky@gmail.com";
-		String password = "admin";
-		Account account = databaseFiller.createAccounts(1).get(0);
-		account.setEmail(email);
-		account.setPassword(password);
+		Account account1 = accounts.get(0);
+		Account account2 = accountService.getByEmailAndPassword(account1.getEmail(), account1.getPassword());
+		
+		if(!account1.getId().equals(account2.getId())) {
+			logAndThrowExcetion("Wrong account was found");
+		}
+	}
+	
+	@Test
+	public void testGetNotifiedUser() {
+		Account account = accountService.getAll().get(0);
+		
+		if(accountService.getConfirmedUser(account.getEmail(), account.getPassword()) != null) {
+			logAndThrowExcetion("Wrong account was found");
+		}
+		
+		account.setIsConfirmed(true);
 		accountService.saveOrUpdate(account);
-		account = accountService.getByEmailAndPassword(email, password);
+		
+		if(accountService.getConfirmedUser(account.getEmail(), account.getPassword()) == null) {
+			logAndThrowExcetion("Notified account wasn't found");
+		}
+	}
+	
+	private void logAndThrowExcetion(String message) {
+		LOGGER.error(message);
+		throw new IllegalStateException(message);
 	}
 	
 	private void wipeDB() {

@@ -3,13 +3,13 @@ package wsvintsitsky.shortener.service;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,6 @@ import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 
-@SuppressWarnings("unused")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class UrlServiceTest {
@@ -33,113 +32,113 @@ public class UrlServiceTest {
 
 	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceTest.class);
 
+	List<Account> accounts;
+	List<Url> urls;
+	List<Tag> tags;
+
 	@Before
-	public void before() {
+	public void setUp() {
 		wipeDB();
+		fillDatabase(2, 2);
 	}
-	
-	@Test
-	public void testInsert() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
 
-		Account account = databaseFiller.createAccounts(1).get(0);
-		Url url = databaseFiller.createUrls(1).get(0);
-
-		accountService.saveOrUpdate(account);
-		account = accountService.get(account.getId());
-		url.setAccount(account);
-		urlService.saveOrUpdate(url);
-
-		url = urlService.get(url.getId());
-
+	private void fillDatabase(int entityCount, int multiplier) {
+		DatabaseFiller filler = new DatabaseFiller();
+		accounts = filler.createAccounts(entityCount);
+		urls = filler.createUrls(accounts.size() * multiplier);
+		tags = filler.createTags(urls.size() * multiplier);
+		Account account;
+		Url url;
+		Tag tag;
+		int i;
+		int j;
+		int n;
+		int urlStart;
+		int tagStart;
+		for (i = 0; i < entityCount; i++) {
+			account = accounts.get(i);
+			accountService.saveOrUpdate(account);
+			urlStart = i * multiplier;
+			for (j = urlStart; j < urlStart + multiplier; j++) {
+				url = urls.get(j);
+				url.setAccount(account);
+				urlService.saveOrUpdate(url);
+				tagStart = j * multiplier;
+				for (n = tagStart; n < tagStart + multiplier; n++) {
+					tag = tags.get(n);
+					tag.getUrls().add(url);
+					tagService.saveOrUpdate(tag);
+					url.getTags().add(tag);
+				}
+			}
+		}
 	}
 
 	@Test
 	public void testUpdate() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-
-		Account account = databaseFiller.createAccounts(1).get(0);
-		accountService.saveOrUpdate(account);
-
-		Url url = databaseFiller.createUrls(1).get(0);
+		Account account = accountService.getAll().get(1);
+		int urlCount = urls.size();
+		Url url = urlService.getAll().get(0);
 		url.setAccount(account);
-
 		urlService.saveOrUpdate(url);
 
-		url.setLongUrl("longUpd");
-		urlService.saveOrUpdate(url);
+		try {
+			urlService.saveOrUpdate(url);
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
 
+		if (urlCount != urlService.getAll().size()) {
+			logAndThrowExcetion("Url was inserted instead of updated");
+		}
 	}
 
 	@Test
 	public void testDelete() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
+		Url url = urlService.getAll().get(0);
 
-		Account account = databaseFiller.createAccounts(1).get(0);
-		accountService.saveOrUpdate(account);
+		try {
+			urlService.delete(url.getId());
+		} catch (PersistenceException ex) {
+			logAndThrowExcetion(ex.getMessage());
+		}
 
-		Url url = databaseFiller.createUrls(1).get(0);
-		url.setAccount(account);
-		urlService.saveOrUpdate(url);
-
-		urlService.delete(url.getId());
-
+		if (urls.size() - 1 != urlService.getAll().size()) {
+			logAndThrowExcetion("Url wasn't updated");
+		}
 	}
 
 	@Test
 	public void testGetUrlWithTags() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		List<Account> accounts = databaseFiller.createAccounts(1);
-		for (Account account : accounts) {
-			accountService.saveOrUpdate(account);
+		Url url1 = urls.get(0);
+		for(Tag tag : url1.getTags()) {
+			tag.setUrls(null);
 		}
-
-		List<Tag> tags = databaseFiller.createTags(1);
-		for (Tag tag : tags) {
-			tagService.saveOrUpdate(tag);
+		Url url2 = urlService.getUrlWithTags(url1.getShortUrl());
+		for(Tag tag : url2.getTags()) {
+			tag.setUrls(null);
 		}
-
-		Url url = databaseFiller.createUrls(1).get(0);
-		url.setAccount(accounts.get(0));
-		url.setTags(tags);
-		urlService.saveOrUpdate(url);
-
-		url = urlService.getUrlWithTags(url.getShortUrl());
-		for(Tag tag : url.getTags()) {
-			tag.setDescription(tag.getDescription() + "changed");
+		boolean condition = url1.getTags().containsAll(url2.getTags()) && url2.getTags().containsAll(url1.getTags());
+		if(!condition) {
+			logAndThrowExcetion("Urls tags were not fetched correctly");
 		}
-		urlService.saveOrUpdate(url);
 	}
 
 	@Test
-	public void testgetLongUrlByShortUrl() {
-		wipeDB();
-		DatabaseFiller databaseFiller = new DatabaseFiller();
-		List<Account> accounts = databaseFiller.createAccounts(1);
-		for (Account account : accounts) {
-			accountService.saveOrUpdate(account);
-		}
-
-		List<Tag> tags = databaseFiller.createTags(1);
-		for (Tag tag : tags) {
-			tagService.saveOrUpdate(tag);
-		}
-
-		Url url = databaseFiller.createUrls(1).get(0);
-		url.setAccount(accounts.get(0));
-		url.setTags(tags);
-		urlService.saveOrUpdate(url);
+	public void testGetLongUrlByShortUrl() {
+		Url url1 = urls.get(0);
+		String longUrl = urlService.getLongUrlByShortUrl(url1.getShortUrl());
 		
-		String lg = url.getLongUrl();
-		
-		String ur = urlService.getLongUrlByShortUrl(url.getShortUrl());
-		Assert.isTrue(lg.equals(ur));
+		if(!url1.getLongUrl().equals(longUrl)) {
+			logAndThrowExcetion("Urls tags were not fetched correctly");
+		}
 	}
-	
+
+	private void logAndThrowExcetion(String message) {
+		LOGGER.error(message);
+		throw new IllegalStateException(message);
+	}
+
 	private void wipeDB() {
 		urlService.deleteAll();
 		tagService.deleteAll();

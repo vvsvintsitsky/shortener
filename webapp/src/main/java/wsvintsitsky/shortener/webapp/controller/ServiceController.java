@@ -20,9 +20,11 @@ import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.datamodel.TagWeb;
 import wsvintsitsky.shortener.webapp.datamodel.UrlWeb;
-import wsvintsitsky.shortener.webapp.error.BadRequestException;
-import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
-import wsvintsitsky.shortener.webapp.error.ErrorInfo;
+import wsvintsitsky.shortener.webapp.exception.BadRequestException;
+import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
+import wsvintsitsky.shortener.webapp.info.ErrorInfo;
+import wsvintsitsky.shortener.webapp.info.ResponseInfo;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
 
 @RestController
 @RequestMapping(value = "/service")
@@ -55,7 +57,7 @@ public class ServiceController {
 	}
 
 	@RequestMapping(method = RequestMethod.PUT)
-	public void updateUrlsTags(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
+	public ResponseInfo updateUrlsTags(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
 		Long accountId = (Long) request.getAttribute("accountId");
 		List<String> incomingTagDescriptions = new ArrayList<String>();
 		Url url;
@@ -64,6 +66,8 @@ public class ServiceController {
 		if(url == null) {
 			throw new BadRequestException("Url not found");
 		}
+		String info = MessageManager.getProperty("message.url.update.success");
+		return new ResponseInfo(info);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)

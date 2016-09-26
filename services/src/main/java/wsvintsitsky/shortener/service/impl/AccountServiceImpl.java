@@ -6,6 +6,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.AccountDao;
@@ -18,6 +20,8 @@ public class AccountServiceImpl implements AccountService {
 	@Inject
 	private AccountDao accountDao;
 
+	private Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+	
 	@Override
 	@Transactional
 	public void saveOrUpdate(Account account) {
@@ -26,8 +30,10 @@ public class AccountServiceImpl implements AccountService {
 			account.setIsConfirmed(false);
 			account.setIsNotified(false);
 			accountDao.insert(account);
+			LOGGER.info("New user created: " + account.toString());
 		} else {
 			accountDao.update(account);
+			LOGGER.info("User updated: " + account.toString());
 		}
 	}
 
@@ -69,6 +75,11 @@ public class AccountServiceImpl implements AccountService {
 		Date date = new Date();
 		date.setTime(date.getTime() - 48 * 3600 * 1000);
 		accountDao.deleteNotConfirmed(date);
+	}
+
+	@Override
+	public Account getConfirmedUser(String email, String password) {
+		return accountDao.getConfirmedUser(email, password);
 	}
 
 }

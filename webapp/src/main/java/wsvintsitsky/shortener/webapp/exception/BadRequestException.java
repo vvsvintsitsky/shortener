@@ -1,7 +1,7 @@
-package wsvintsitsky.shortener.webapp.error;
+package wsvintsitsky.shortener.webapp.exception;
 
 public class BadRequestException extends RuntimeException {
-	
+
 	public BadRequestException() {
 		
 	}

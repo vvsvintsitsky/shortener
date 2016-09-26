@@ -1,10 +1,13 @@
 package wsvintsitsky.shortener.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.AccountDao;
@@ -26,6 +29,8 @@ public class UrlServiceImpl implements UrlService {
 	
 	@Inject
 	private AccountDao accountDao;
+	
+	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceImpl.class);
 	
 	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
@@ -64,7 +69,7 @@ public class UrlServiceImpl implements UrlService {
 	}
 	
 	private String shortenUrl(String longUrl) {
-		double id1 = (double)(longUrl.hashCode() + (double)4*2147483647);
+		double id1 = (double)(longUrl.hashCode() + (double)(new Date().hashCode()) +  (double)3*2147483647);
 		int z;
 		StringBuilder sb = new StringBuilder();
 		while(id1 > 0) {
@@ -118,6 +123,7 @@ public class UrlServiceImpl implements UrlService {
 		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
 		insertNewTags(tagDescriptions, existingTags);
 		url.setTags(existingTags);
+		LOGGER.info(String.format("Url(%s) has been updated: %s", url.getId(), url));
 		return urlDao.update(url);
 	}
 	
@@ -136,6 +142,7 @@ public class UrlServiceImpl implements UrlService {
 		url.setShortUrl(shortenUrl(url.getLongUrl()));
 		url.setVisited(0L);
 		url = urlDao.insert(url);
+		LOGGER.info(String.format("User%s created new url: %s", account.getId(), url));
 		return url;
 	}
 
@@ -147,7 +154,6 @@ public class UrlServiceImpl implements UrlService {
 			tagDao.insert(tag);
 			existingTags.add(tag);
 		}
-
 	}
 
 	private void removeExistingTagsFromDescriptions(List<String> tagDescriptions, List<Tag> existingTags) {

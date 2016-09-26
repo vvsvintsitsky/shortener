@@ -16,9 +16,9 @@ import org.springframework.http.HttpStatus;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.UrlService;
-import wsvintsitsky.shortener.webapp.error.ErrorInfo;
+import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
+import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
-import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
 
 @RestController
 @RequestMapping(value = "/")

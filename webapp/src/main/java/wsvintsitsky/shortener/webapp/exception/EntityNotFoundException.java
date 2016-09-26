@@ -1,4 +1,4 @@
-package wsvintsitsky.shortener.webapp.error;
+package wsvintsitsky.shortener.webapp.exception;
 
 public class EntityNotFoundException extends RuntimeException {
 

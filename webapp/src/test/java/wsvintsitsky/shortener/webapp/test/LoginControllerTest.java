@@ -100,6 +100,8 @@ public class LoginControllerTest {
 	@Test
 	public void testLogin() throws Exception {
 		Account account = accountService.getAll().get(0);
+		account.setIsConfirmed(true);
+		accountService.saveOrUpdate(account);
 		AccountWeb accountWeb = new AccountWeb();
 		AccountWeb returnedAccountWeb;
 		ObjectMapper mapper = new ObjectMapper();

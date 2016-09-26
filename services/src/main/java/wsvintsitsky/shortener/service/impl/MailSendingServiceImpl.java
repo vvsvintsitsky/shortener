@@ -1,6 +1,5 @@
 package wsvintsitsky.shortener.service.impl;
 
-import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -29,17 +28,11 @@ public class MailSendingServiceImpl implements MailSendingService {
 	private AccountService accountService;
 
 	private Logger LOGGER = LoggerFactory.getLogger(MailSendingServiceImpl.class);
-	
-	@Override
-	public void sendRegisteredEmail(Account to, String from, String userId, String password,
-			String messageSubject, String messageText) {
-		MailSender mailSender = new MailSender(to, from, userId, password, messageSubject, messageText);
-		mailSender.start();
-	}
 
 	@Override
-	public void sendForgottenEmails(String from, String userId, String password) {
-		MailSender mailSender = new MailSender(from, userId, password);
+	public void sendRegisteredEmail(Account to, String from, String userId, String password, String messageSubject,
+			String messageText) {
+		MailSender mailSender = new MailSender(to, from, userId, password, messageSubject, messageText);
 		mailSender.start();
 	}
 
@@ -60,12 +53,6 @@ public class MailSendingServiceImpl implements MailSendingService {
 			this.password = password;
 			this.messageSubject = messageSubject;
 			this.messageText = messageText;
-		}
-
-		public MailSender(String from, String userId, String password) {
-			this.from = from;
-			this.userId = userId;
-			this.password = password;
 		}
 
 		public void sendRegisteredMail() {
@@ -90,7 +77,7 @@ public class MailSendingServiceImpl implements MailSendingService {
 			properties.put("mail.smtp.auth", "true");
 			return properties;
 		}
-		
+
 		private Authenticator setupAuthenticator() {
 			Authenticator authenticator = new Authenticator() {
 				public PasswordAuthentication getPasswordAuthentication() {
@@ -99,7 +86,7 @@ public class MailSendingServiceImpl implements MailSendingService {
 			};
 			return authenticator;
 		}
-		
+
 		private MimeMessage setupMimeMessage(Session session) throws MessagingException, AddressException {
 			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
@@ -107,38 +94,11 @@ public class MailSendingServiceImpl implements MailSendingService {
 			message.setSubject(messageSubject);
 			message.setText(messageText);
 			return message;
-		}		
-
-		private void sendForgottenCredentials() {
-			List<Account> accounts = accountService.findNotNotified();
-			String messageSubject = "Confirm registration";
-			for (Account account : accounts) {
-				String approveLink = String.format("http://localhost:8087/confirmation/?&id=%d&hashCode=%d",
-						account.getId(), account.hashCode());
-				String messageText = String.format("%s \n\n%s %s\n%s %s \n\n%s \n%s",
-						"Hello! You have been registered in WSvintsitsky's Shortener System", "Your login: ",
-						account.getEmail(), "Your password: ", account.getPassword(),
-						"To activate your account click this link: ", approveLink);
-				MailSender mailSender = new MailSender(account, from, userId, password, messageSubject, messageText);
-				mailSender.start();
-			}
 		}
 
 		@Override
 		public void run() {
-			if (account != null) {
-				sendRegisteredMail();
-			} else {
-				while (true) {
-					sendForgottenCredentials();
-					try {
-						sleep(1000 * 3600);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
+			sendRegisteredMail();
 		}
 	}
 }

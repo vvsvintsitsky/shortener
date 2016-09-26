@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
-import wsvintsitsky.shortener.webapp.error.ErrorInfo;
-import wsvintsitsky.shortener.webapp.error.BadRequestException;
-import wsvintsitsky.shortener.webapp.error.EntityNotFoundException;
+import wsvintsitsky.shortener.webapp.exception.BadRequestException;
+import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
+import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.security.WebTokenManager;
 
@@ -47,7 +47,7 @@ public class LoginController {
 		if(login == null || password == null) {
 			throw new BadRequestException("Incorrect login or password");
 		}
-		Account account = accountService.getByEmailAndPassword(login, password);
+		Account account = accountService.getConfirmedUser(login, password);
 		if(account == null) {
 			throw new EntityNotFoundException("Incorrect login or password");
 		}

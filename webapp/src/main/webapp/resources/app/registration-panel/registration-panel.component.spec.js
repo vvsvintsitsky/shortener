@@ -52,7 +52,9 @@ describe('registrationPanel', function() {
 					email : email,
 					password : password
 			}
-			var responseData = 'data + ';
+			var responseData = {
+				info : "data + "	
+			};
 			$ctrl.password = password;
 			$ctrl.email = email;
 			
@@ -63,6 +65,7 @@ describe('registrationPanel', function() {
 			
 			$httpBackend.flush();
 			
+			expect(alert).toHaveBeenCalledWith(responseData.info);
 			expect($location.path()).toEqual('/login');
 		});
 		

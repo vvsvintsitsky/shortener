@@ -142,7 +142,10 @@ describe("core.url", function() {
 			accounts : null,
 			tags : requestTags
 		};
-
+		var resposeData = {
+				info : 'info'
+		};
+		
 		expect($cookies.get(authHeaderName)).toBe(undefined);
 
 		$cookies.put(authHeaderName, authHeaderValue);
@@ -152,13 +155,13 @@ describe("core.url", function() {
 			'Content-Type' : 'application/json;charset=utf-8'
 		};
 		$httpBackend.expectPUT(urlService.servicePath, requestUrl, headers).respond(200,
-				'');
+				responseData);
 		urlService.updateUrl(requestUrl).then(function(returnFromPromise) {
 			result = returnFromPromise;
 		});
 		
 		$httpBackend.flush();
-		expect(result).toEqual(true);
+		expect(result).toEqual(responseData);
 	}));
 	
 	it('should test updateUrl function failure', inject(function($cookies) {
@@ -181,7 +184,10 @@ describe("core.url", function() {
 			accounts : null,
 			tags : requestTags
 		};
-
+		var errorInfo = {
+				url : urlService.servicePath,
+				ex : 'error'
+		};
 		expect($cookies.get(authHeaderName)).toBe(undefined);
 
 		$cookies.put(authHeaderName, authHeaderValue);
@@ -191,13 +197,13 @@ describe("core.url", function() {
 			'Content-Type' : 'application/json;charset=utf-8'
 		};
 		$httpBackend.expectPUT(urlService.servicePath, requestUrl, headers).respond(404,
-				'');
+				errorInfo);
 		urlService.updateUrl(requestUrl).then(function(returnFromPromise) {
 			result = returnFromPromise;
 		});
 		
 		$httpBackend.flush();
-		expect(result).toEqual(false);
+		expect(result).toEqual(errorInfo);
 	}));
 	
 	it('should test createUrl function success', inject(function($cookies) {
