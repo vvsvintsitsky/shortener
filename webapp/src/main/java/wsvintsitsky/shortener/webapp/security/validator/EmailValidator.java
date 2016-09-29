@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.webapp.security.validator;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,17 +24,17 @@ public class EmailValidator {
 		pattern = Pattern.compile(EMAIL_PATTERN);
 	}
 
-	public void validate(final String hex) {
-		checkContents(hex);
+	public void validate(final String hex, final Locale locale) {
+		checkContents(hex, locale);
 		matcher = pattern.matcher(hex);
 		if(!matcher.matches()) {
-			throw new BadRequestException(MessageManager.getProperty("error.account.email.incorrect"));
+			throw new BadRequestException(MessageManager.getProperty("error.account.email.incorrect", locale));
 		}
 	}
 
-	private void checkContents(final String hex) {
+	private void checkContents(final String hex, Locale locale) {
 		if(hex == null) {
-			throw new BadRequestException(MessageManager.getProperty("error.account.email.empty"));
+			throw new BadRequestException(MessageManager.getProperty("error.account.email.empty", locale));
 		}
 	}
 }

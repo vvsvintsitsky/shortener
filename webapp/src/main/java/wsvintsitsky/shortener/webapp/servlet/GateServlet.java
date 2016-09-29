@@ -1,6 +1,7 @@
 package wsvintsitsky.shortener.webapp.servlet;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,9 @@ public class GateServlet extends DispatcherServlet {
 		String from = MailManager.getProperty("mail.user.name");
 		String userId = MailManager.getProperty("mail.user.id");
 		String password = MailManager.getProperty("mail.user.password");
-		String messageSubject = MessageManager.getProperty("message.registration.mail.subject");
-		String textTemplate = MessageManager.getProperty("message.registration.mail.body");
+		Locale locale = new Locale("en", "GB");
+		String messageSubject = MessageManager.getProperty("message.registration.mail.subject", locale);
+		String textTemplate = MessageManager.getProperty("message.registration.mail.body", locale);
 		Thread thr = new Thread() {
 			@Override
 			public void run() {

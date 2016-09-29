@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.webapp.security.validator;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,17 +25,17 @@ public class PasswordValidator {
 	private static final String PASSWORD_PATTERN =
 		"\\w+";
 	
-	public void validate(final String hex) {
-		checkContents(hex);
+	public void validate(final String hex, final Locale locale) {
+		checkContents(hex, locale);
 		matcher = pattern.matcher(hex);
 		if(!matcher.matches()) {
-			throw new BadRequestException(MessageManager.getProperty("error.account.password.incorrect"));
+			throw new BadRequestException(MessageManager.getProperty("error.account.password.incorrect", locale));
 		}
 	}
 
-	private void checkContents(final String hex) {
+	private void checkContents(final String hex, final Locale locale) {
 		if(hex == null) {
-			throw new BadRequestException(MessageManager.getProperty("error.account.password.empty"));
+			throw new BadRequestException(MessageManager.getProperty("error.account.password.empty", locale));
 		}
 	}
 }

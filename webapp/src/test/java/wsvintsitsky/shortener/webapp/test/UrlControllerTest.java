@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Locale;
 
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
@@ -24,6 +25,7 @@ import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -105,12 +107,13 @@ public class UrlControllerTest {
 	public void testRedirect() throws Exception {
 		Url url = urlService.getAll().get(0);
 		String redirect;
+		Locale locale = Locale.getDefault();
 		if (!url.getLongUrl().startsWith("http")) {
 			redirect = "http://" + url.getLongUrl();
 		} else {
 			redirect = url.getLongUrl();
 		}
-		mockMvc.perform(get("/fakeUrl")).andExpect(status().isNotFound()).andExpect(jsonPath("$.ex", is("No such URL found")));
+		mockMvc.perform(get("/fakeUrl")).andExpect(status().isNotFound()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.notfound", locale))));
 
 		mockMvc.perform(get("/" + url.getShortUrl())).andExpect(status().isMovedTemporarily())
 				.andExpect(redirectedUrl(redirect));

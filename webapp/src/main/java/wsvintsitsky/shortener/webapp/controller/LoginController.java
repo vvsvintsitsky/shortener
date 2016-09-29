@@ -1,6 +1,8 @@
 package wsvintsitsky.shortener.webapp.controller;
 
 import java.io.IOException;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +45,14 @@ public class LoginController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public void login(HttpServletResponse response, @RequestBody AccountWeb incomingAccount) throws IOException {
+	public void login(HttpServletRequest request, HttpServletResponse response, @RequestBody AccountWeb incomingAccount) throws IOException {
 		String login = incomingAccount.getEmail();
 		String password = incomingAccount.getPassword();
-		AccountValidator.getInstance().validate(incomingAccount);
+		Locale locate = request.getLocale();
+		AccountValidator.getInstance().validate(incomingAccount, locate);
 		Account account = accountService.getByEmailAndPassword(login, password, true);
 		if(account == null) {
-			throw new EntityNotFoundException(MessageManager.getProperty("error.account.notfound"));
+			throw new EntityNotFoundException(MessageManager.getProperty("error.account.notfound", request.getLocale()));
 		}
 		String jwt = WebTokenManager.createJWT(account.getEmail(), account.getPassword());
 		String jwtName = ConfigurationManager.getProperty("jwt.name");

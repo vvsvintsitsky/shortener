@@ -44,20 +44,20 @@ public class RegistrationController {
 	private RegistrationService registrationService;
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseInfo register(@RequestBody AccountWeb incomingCredentials) {
+	public ResponseInfo register(HttpServletRequest request, @RequestBody AccountWeb incomingCredentials) {
 		String email = incomingCredentials.getEmail();
 		String password = incomingCredentials.getPassword();
-		String messageSubject = MessageManager.getProperty("message.registration.mail.subject");
-		String textTemplate = MessageManager.getProperty("message.registration.mail.body");
+		String messageSubject = MessageManager.getProperty("message.registration.mail.subject", request.getLocale());
+		String textTemplate = MessageManager.getProperty("message.registration.mail.body", request.getLocale());
 		String link = ConfirmationStringManager.generateConfirmationString(email, password);
 		String messageText = String.format(textTemplate, link);
 		
-		AccountValidator.getInstance().validate(incomingCredentials);
+		AccountValidator.getInstance().validate(incomingCredentials, request.getLocale());
 		
 		registrationService.register(email, password, MailManager.getProperty("mail.user.name"),
 				MailManager.getProperty("mail.user.id"), MailManager.getProperty("mail.user.password"), messageSubject,
 				messageText);
-		String resp = MessageManager.getProperty("message.registration.success") + email;
+		String resp = MessageManager.getProperty("message.registration.success", request.getLocale()) + email;
 		return new ResponseInfo(resp);
 	}
 
@@ -69,6 +69,6 @@ public class RegistrationController {
 				request.getParameter(ConfigurationManager.getProperty("jwt.confirmation.third")));
 		registrationService.confirm(accountWeb.getEmail(), accountWeb.getPassword());
 
-		return MessageManager.getProperty("message.activation.success");
+		return MessageManager.getProperty("message.activation.success", request.getLocale());
 	}
 }

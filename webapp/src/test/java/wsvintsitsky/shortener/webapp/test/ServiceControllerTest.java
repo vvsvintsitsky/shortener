@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -122,6 +123,7 @@ public class ServiceControllerTest {
 	public void testUpdateUrlsTags() throws Exception {
 		String requestString = "/service";
 		Account account = accountService.getAll().get(0);
+		Locale locale = Locale.getDefault();
 		Url url = urlService.getUrlsByAccountId(account.getId()).get(0);
 		List<TagWeb> webTags = new ArrayList<TagWeb>();
 		TagWeb tagWeb = new TagWeb();
@@ -134,13 +136,13 @@ public class ServiceControllerTest {
 		byte jsonObject[] = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty", locale))));
 		
 		urlWeb.setDescription("urlWebDescription");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.longurl.incorrect"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.longurl.incorrect", locale))));
 		
 		webTags.add(tagWeb);
 		urlWeb.setTags(webTags);
@@ -148,7 +150,7 @@ public class ServiceControllerTest {
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty", locale))));
 		
 		tagWeb.setDescription("tagWebDescr");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);
@@ -159,6 +161,7 @@ public class ServiceControllerTest {
 	@Test
 	public void testCreateUrl() throws Exception {
 		String requestString = "/service";
+		Locale locale = Locale.getDefault();
 		Account account = accountService.getAll().get(0);
 		urlService.deleteAll();
 		List<TagWeb> webTags = new ArrayList<TagWeb>();
@@ -170,21 +173,21 @@ public class ServiceControllerTest {
 		byte jsonObject[] = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty", locale))));
 		
 		urlWeb.setDescription("urlWebDescription");
 		urlWeb.setLongUrl("localhost");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.tags.empty"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.tags.empty", locale))));
 		
 		webTags.add(tagWeb);
 		urlWeb.setTags(webTags); 
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty"))));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty", locale))));
 		
 		tagWeb.setDescription("tagWebDescr");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -101,6 +102,7 @@ public class LoginControllerTest {
 	@Test
 	public void testLogin() throws Exception {
 		Account account = accountService.getAll().get(0);
+		Locale locale = Locale.getDefault();
 		account.setIsConfirmed(true);
 		accountService.saveOrUpdate(account);
 		AccountWeb accountWeb = new AccountWeb();
@@ -111,18 +113,18 @@ public class LoginControllerTest {
 		
 		byte jsonObject[] = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty"))));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty", locale))));
 		
 		accountWeb.setEmail(account.getEmail());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.password.empty"))));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.password.empty", locale))));
 
 		accountWeb.setEmail(null);
 		accountWeb.setPassword(account.getPassword());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty"))));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty", locale))));
 		
 		accountWeb.setEmail(account.getEmail());
 		accountWeb.setPassword(account.getPassword());

@@ -3,6 +3,7 @@ package wsvintsitsky.shortener.webapp.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -61,19 +62,19 @@ public class ServiceController {
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseInfo updateUrlsTags(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl);
+		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl, request.getLocale());
 		Url url = urlService.updateUrlsTags(accountId, incomingUrl.getShortUrl(), incomingTagDescriptions);
 		if(url == null) {
-			throw new BadRequestException(MessageManager.getProperty("error.url.notfound"));
+			throw new BadRequestException(MessageManager.getProperty("error.url.notfound", request.getLocale()));
 		}
-		String info = MessageManager.getProperty("message.url.update.success");
+		String info = MessageManager.getProperty("message.url.update.success", request.getLocale());
 		return new ResponseInfo(info);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	public Url createUrl(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl);
+		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl, request.getLocale());
 		Url url = urlService.createUrl(accountId, incomingUrl.getLongUrl(), incomingUrl.getDescription(), incomingTagDescriptions);
 		url.setAccount(null);
 		url.setTags(null);
@@ -86,14 +87,14 @@ public class ServiceController {
 		return urlService.checkOwnership(accountId, shortUrl);
 	}
 	
-	private List<String> validateIncomingUrl(UrlWeb incomingUrl) {
+	private List<String> validateIncomingUrl(UrlWeb incomingUrl, Locale locale) {
 		List<String> incomingTagDescriptions = new ArrayList<String>();
-		UrlValidator.getInstance().validate(incomingUrl);
+		UrlValidator.getInstance().validate(incomingUrl, locale);
 		if(incomingUrl.getTags() == null) {
-			throw new BadRequestException(MessageManager.getProperty("error.url.tags.empty"));
+			throw new BadRequestException(MessageManager.getProperty("error.url.tags.empty", locale));
 		}
 		for (TagWeb tagWeb : incomingUrl.getTags()) {
-			TagValidator.getInstance().validate(tagWeb);
+			TagValidator.getInstance().validate(tagWeb, locale);
 			incomingTagDescriptions.add(tagWeb.getDescription());
 		}
 		return incomingTagDescriptions;

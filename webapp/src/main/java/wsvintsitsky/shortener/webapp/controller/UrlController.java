@@ -19,6 +19,7 @@ import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
 
 @RestController
 @RequestMapping(value = "/")
@@ -34,10 +35,10 @@ public class UrlController {
 	}
 
 	@RequestMapping(value = "/{shortUrl}", method = RequestMethod.GET)
-	public void redirect(HttpServletResponse response, @PathVariable String shortUrl) throws IOException {
+	public void redirect(HttpServletRequest request, HttpServletResponse response, @PathVariable String shortUrl) throws IOException {
 		String url = urlService.getLongUrlByShortUrl(shortUrl);
 		if (url == null) {
-			throw new EntityNotFoundException("No such URL found");
+			throw new EntityNotFoundException(MessageManager.getProperty("error.url.notfound", request.getLocale()));
 		}
 		if(!url.startsWith("http")) {
 			url = "http://" + url;
@@ -53,10 +54,10 @@ public class UrlController {
 	}
 	
 	@RequestMapping(value = "/info/{shortUrl}", method = RequestMethod.GET)
-	public Url getUrlWithTags(@PathVariable String shortUrl) throws IOException {
+	public Url getUrlWithTags(HttpServletRequest request, @PathVariable String shortUrl) throws IOException {
 		Url url = urlService.getUrlWithTags(shortUrl);
 		if (url == null) {
-			throw new EntityNotFoundException("No such URL found");
+			throw new EntityNotFoundException(MessageManager.getProperty("error.url.notfound", request.getLocale()));
 		}
 		url.setAccount(null);
 		for (Tag tag : url.getTags()) {

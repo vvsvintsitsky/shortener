@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -102,6 +103,7 @@ public class RegistrationControllerTest {
 	@Test
 	public void testRegister() throws Exception {
 		AccountWeb accountWeb = new AccountWeb();
+		Locale locale = Locale.getDefault();
 		ObjectMapper mapper = new ObjectMapper();
 		String jsonObject = mapper.writeValueAsString(accountWeb);
 
@@ -129,18 +131,19 @@ public class RegistrationControllerTest {
 		accountWeb.setPassword("webPassword");
 		jsonObject = mapper.writeValueAsString(accountWeb);
 		mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isOk()).andExpect(jsonPath("$.info", is(MessageManager.getProperty("message.registration.success") + accountWeb.getEmail())));
+				.andExpect(status().isOk()).andExpect(jsonPath("$.info", is(MessageManager.getProperty("message.registration.success", locale) + accountWeb.getEmail())));
 	}
 
 	@Test
 	public void testConfirm() throws Exception {
 		Account account = accountService.getAll().get(0);
+		Locale locale = Locale.getDefault();
 		String jwt = WebTokenManager.createJWT(account.getEmail(), account.getPassword());
 		String strings[] = jwt.split("\\.");
 		mockMvc.perform(get("/register/confirm")
 				.param(ConfigurationManager.getProperty("jwt.confirmation.first"), strings[0])
 				.param(ConfigurationManager.getProperty("jwt.confirmation.second"), strings[1])
 				.param(ConfigurationManager.getProperty("jwt.confirmation.third"), strings[2]))
-				.andExpect(status().isOk()).andExpect(content().string(MessageManager.getProperty("message.activation.success")));
+				.andExpect(status().isOk()).andExpect(content().string(MessageManager.getProperty("message.activation.success", locale)));
 	}
 }

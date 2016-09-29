@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.webapp.security.validator;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,17 +25,17 @@ public class TagValidator {
 		pattern = Pattern.compile(TAG_PATTERN);
 	}
 	
-	public void validate(TagWeb tagWeb) {
-		checkContents(tagWeb);
+	public void validate(TagWeb tagWeb, final Locale locale) {
+		checkContents(tagWeb, locale);
 		matcher = pattern.matcher(tagWeb.getDescription());
 		if(!matcher.matches()) {
-			throw new BadRequestException(MessageManager.getProperty("error.tag.description.incorrect"));
+			throw new BadRequestException(MessageManager.getProperty("error.tag.description.incorrect", locale));
 		}
 	}
 
-	private void checkContents(TagWeb tagWeb) {
+	private void checkContents(TagWeb tagWeb, final Locale locale) {
 		if(tagWeb.getDescription() == null) {
-			throw new BadRequestException(MessageManager.getProperty("error.tag.description.empty"));
+			throw new BadRequestException(MessageManager.getProperty("error.tag.description.empty", locale));
 		}
 	}
 }

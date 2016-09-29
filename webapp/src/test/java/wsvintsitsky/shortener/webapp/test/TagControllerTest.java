@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -93,10 +95,11 @@ public class TagControllerTest {
 	@Test
 	public void testGetTagWithUrls() throws Exception {
 		Tag tag = tagService.getAll().get(0);
+		Locale locale = Locale.getDefault();
 		tag = tagService.getTagWithUrls(tag.getDescription());
 		
 		mockMvc.perform(get("/tag/fakeTag")).andExpect(status().isNotFound())
-		.andExpect(jsonPath("$.ex", is("No such tag found")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.notfound", locale))));
 		
 		mockMvc.perform(get("/tag/" + tag.getDescription())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", is(tag.getId().intValue())))

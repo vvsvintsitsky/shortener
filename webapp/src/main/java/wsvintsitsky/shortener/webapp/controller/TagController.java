@@ -36,12 +36,12 @@ public class TagController {
 	}
 	
 	@RequestMapping(value = "/{tagDescription}", method = RequestMethod.GET)
-	public Tag getTagWithUrls(@PathVariable String tagDescription) throws IOException {
+	public Tag getTagWithUrls(HttpServletRequest request, @PathVariable String tagDescription) throws IOException {
 		TagWeb tagWeb = new TagWeb(null, tagDescription, null);
-		TagValidator.getInstance().validate(tagWeb);
+		TagValidator.getInstance().validate(tagWeb, request.getLocale());
 		Tag tag = tagService.getTagWithUrls(tagDescription);
 		if(tag == null) {
-			throw new EntityNotFoundException(MessageManager.getProperty("error.tag.notfound"));
+			throw new EntityNotFoundException(MessageManager.getProperty("error.tag.notfound", request.getLocale()));
 		}
 		for (Url url : tag.getUrls()) {
 			url.setTags(null);

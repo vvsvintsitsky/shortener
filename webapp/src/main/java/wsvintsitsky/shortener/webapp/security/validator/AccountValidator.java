@@ -1,5 +1,7 @@
 package wsvintsitsky.shortener.webapp.security.validator;
 
+import java.util.Locale;
+
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 
 public class AccountValidator {
@@ -14,8 +16,8 @@ public class AccountValidator {
 		
 	}
 	
-	public void validate(AccountWeb accountWeb) {
-		EmailValidator.getInstance().validate(accountWeb.getEmail());
-		PasswordValidator.getInstance().validate(accountWeb.getPassword());
+	public void validate(AccountWeb accountWeb, Locale locale) {
+		EmailValidator.getInstance().validate(accountWeb.getEmail(), locale);
+		PasswordValidator.getInstance().validate(accountWeb.getPassword(), locale);
 	}
 }
