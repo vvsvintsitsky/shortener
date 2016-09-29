@@ -10,9 +10,7 @@ public interface AccountService {
 	
 	Account get(Long id);
 	
-	Account getByEmailAndPassword(String email, String password);
-	
-	Account getConfirmedUser(String email, String password);
+	Account getByEmailAndPassword(String email, String password, Boolean isConfirmed);
 	
 	List<Account> getAll();
 	

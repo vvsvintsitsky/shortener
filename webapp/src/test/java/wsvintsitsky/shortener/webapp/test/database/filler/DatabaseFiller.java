@@ -20,7 +20,7 @@ public class DatabaseFiller {
 		Account account;
 		for(int i = 0; i < quantity; i++) {
 			account = new Account();
-			account.setEmail(email + i);
+			account.setEmail(email + i + "@mail.dom");
 			account.setPassword(password + i);
 			accounts.add(account);
 		}

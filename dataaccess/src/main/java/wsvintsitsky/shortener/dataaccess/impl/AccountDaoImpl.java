@@ -10,6 +10,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -25,7 +26,7 @@ public class AccountDaoImpl extends AbstractDaoImpl<Account, Long> implements Ac
 	}
 
 	@Override
-	public Account getByEmailAndPassword(String email, String password) {
+	public Account getByEmailAndPassword(String email, String password, Boolean isConfirmed) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Account> cq = cb.createQuery(Account.class);
@@ -33,7 +34,12 @@ public class AccountDaoImpl extends AbstractDaoImpl<Account, Long> implements Ac
 		
 		Predicate emailCondition = cb.equal(from.get(Account_.email), email);
 		Predicate passwordCondition = cb.equal(from.get(Account_.password), password);
-		cq.where(cb.and(emailCondition, passwordCondition));
+		Predicate condition = cb.and(emailCondition, passwordCondition);
+		if(isConfirmed != null) {
+			Predicate isConfirmedCondition = cb.equal(from.get(Account_.isConfirmed), isConfirmed);
+			condition = cb.and(condition, isConfirmedCondition);
+		}
+		cq.where(condition);
 		
 		TypedQuery<Account> q = em.createQuery(cq);
 		List<Account> accounts = q.getResultList();
@@ -75,25 +81,23 @@ public class AccountDaoImpl extends AbstractDaoImpl<Account, Long> implements Ac
 	}
 
 	@Override
-	public Account getConfirmedUser(String email, String password) {
+	public int confirmUser(String email, String password) {
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Account> cq = cb.createQuery(Account.class);
-		Root<Account> from = cq.from(Account.class);
+		CriteriaUpdate<Account> cu = cb.createCriteriaUpdate(Account.class);
+		Root<Account> from = cu.from(Account.class);
 		
 		Predicate emailCondition = cb.equal(from.get(Account_.email), email);
 		Predicate passwordCondition = cb.equal(from.get(Account_.password), password);
-		Predicate isConfirmedCondition = cb.equal(from.get(Account_.isConfirmed), true);
-		cq.where(cb.and(emailCondition, passwordCondition, isConfirmedCondition));
 		
-		TypedQuery<Account> q = em.createQuery(cq);
-		List<Account> accounts = q.getResultList();
-		if(accounts.size() == 0) {
-			return null;
-		} else if (accounts.size() == 1) {
-			return accounts.get(0);
+		cu.set("isConfirmed", true);
+		cu.where(cb.and(emailCondition, passwordCondition));
+		
+		int updated = em.createQuery(cu).executeUpdate();
+		if(updated == 1 || updated == 0) {
+			return updated;
 		} else {
-			throw new IllegalStateException("more than 1 account found");
+			throw new IllegalStateException("More than one user has been updated");
 		}
 	}
 

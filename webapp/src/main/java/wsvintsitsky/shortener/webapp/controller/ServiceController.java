@@ -25,6 +25,8 @@ import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.info.ResponseInfo;
 import wsvintsitsky.shortener.webapp.resource.MessageManager;
+import wsvintsitsky.shortener.webapp.security.validator.TagValidator;
+import wsvintsitsky.shortener.webapp.security.validator.UrlValidator;
 
 @RestController
 @RequestMapping(value = "/service")
@@ -59,12 +61,10 @@ public class ServiceController {
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseInfo updateUrlsTags(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<String> incomingTagDescriptions = new ArrayList<String>();
-		Url url;
-		validateIncomingUrl(incomingUrl, incomingTagDescriptions);
-		url = urlService.updateUrlsTags(accountId, incomingUrl.getShortUrl(), incomingTagDescriptions);
+		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl);
+		Url url = urlService.updateUrlsTags(accountId, incomingUrl.getShortUrl(), incomingTagDescriptions);
 		if(url == null) {
-			throw new BadRequestException("Url not found");
+			throw new BadRequestException(MessageManager.getProperty("error.url.notfound"));
 		}
 		String info = MessageManager.getProperty("message.url.update.success");
 		return new ResponseInfo(info);
@@ -73,8 +73,7 @@ public class ServiceController {
 	@RequestMapping(method = RequestMethod.POST)
 	public Url createUrl(HttpServletRequest request, @RequestBody UrlWeb incomingUrl) throws IOException {
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<String> incomingTagDescriptions = new ArrayList<String>();
-		validateIncomingUrl(incomingUrl, incomingTagDescriptions);
+		List<String> incomingTagDescriptions = validateIncomingUrl(incomingUrl);
 		Url url = urlService.createUrl(accountId, incomingUrl.getLongUrl(), incomingUrl.getDescription(), incomingTagDescriptions);
 		url.setAccount(null);
 		url.setTags(null);
@@ -87,18 +86,16 @@ public class ServiceController {
 		return urlService.checkOwnership(accountId, shortUrl);
 	}
 	
-	private void validateIncomingUrl(UrlWeb incomingUrl, List<String> incomingTagDescriptions) {
-		if(incomingUrl.getDescription() == null) {
-			throw new BadRequestException("Url description cannot be empty");
-		}
+	private List<String> validateIncomingUrl(UrlWeb incomingUrl) {
+		List<String> incomingTagDescriptions = new ArrayList<String>();
+		UrlValidator.getInstance().validate(incomingUrl);
 		if(incomingUrl.getTags() == null) {
-			throw new BadRequestException("Url must contain at least 1 tag");
+			throw new BadRequestException(MessageManager.getProperty("error.url.tags.empty"));
 		}
 		for (TagWeb tagWeb : incomingUrl.getTags()) {
-			if(tagWeb.getDescription() == null) {
-				throw new BadRequestException("Tag description cannot be empty");
-			}
+			TagValidator.getInstance().validate(tagWeb);
 			incomingTagDescriptions.add(tagWeb.getDescription());
 		}
+		return incomingTagDescriptions;
 	}
 }

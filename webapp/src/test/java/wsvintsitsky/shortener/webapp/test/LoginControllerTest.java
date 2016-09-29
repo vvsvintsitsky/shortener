@@ -30,7 +30,8 @@ import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
-import wsvintsitsky.shortener.webapp.security.WebTokenManager;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
+import wsvintsitsky.shortener.webapp.security.manager.WebTokenManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -110,24 +111,18 @@ public class LoginControllerTest {
 		
 		byte jsonObject[] = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty"))));
 		
 		accountWeb.setEmail(account.getEmail());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.password.empty"))));
 
 		accountWeb.setEmail(null);
 		accountWeb.setPassword(account.getPassword());
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
 		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
-
-		accountWeb.setEmail("_" + account.getEmail());
-		accountWeb.setPassword(account.getPassword());
-		jsonObject = mapper.writeValueAsBytes(accountWeb);
-		mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
-				.andExpect(status().isUnauthorized()).andExpect(jsonPath("$.ex", is("Incorrect login or password")));
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.account.email.empty"))));
 		
 		accountWeb.setEmail(account.getEmail());
 		accountWeb.setPassword(account.getPassword());

@@ -21,8 +21,8 @@ import wsvintsitsky.shortener.webapp.info.ResponseInfo;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.resource.MailManager;
 import wsvintsitsky.shortener.webapp.resource.MessageManager;
-import wsvintsitsky.shortener.webapp.security.ConfirmationStringManager;
-import wsvintsitsky.shortener.webapp.validator.EmailValidator;
+import wsvintsitsky.shortener.webapp.security.manager.ConfirmationStringManager;
+import wsvintsitsky.shortener.webapp.security.validator.AccountValidator;
 
 @RestController
 @RequestMapping(value = "/register")
@@ -33,7 +33,7 @@ public class RegistrationController {
 	public ErrorInfo handleBadRequestException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
-	
+
 	@ExceptionHandler(PersistenceException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorInfo handlePersistenceException(HttpServletRequest req, Exception ex) {
@@ -45,20 +45,19 @@ public class RegistrationController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseInfo register(@RequestBody AccountWeb incomingCredentials) {
-		EmailValidator ev = EmailValidator.getInstance();
-		String login = incomingCredentials.getEmail();
+		String email = incomingCredentials.getEmail();
 		String password = incomingCredentials.getPassword();
 		String messageSubject = MessageManager.getProperty("message.registration.mail.subject");
 		String textTemplate = MessageManager.getProperty("message.registration.mail.body");
-		String link = ConfirmationStringManager.generateConfirmationString(login, password);
+		String link = ConfirmationStringManager.generateConfirmationString(email, password);
 		String messageText = String.format(textTemplate, link);
-		if (login == null || password == null || !ev.validate(login)) {
-			throw new BadRequestException("Incorrect login or password");
-		}
-		registrationService.register(login, password, MailManager.getProperty("mail.user.name"),
-				MailManager.getProperty("mail.user.id"), MailManager.getProperty("mail.user.password"),
-				messageSubject, messageText);
-		String resp = MessageManager.getProperty("message.registration.success") + login;
+		
+		AccountValidator.getInstance().validate(incomingCredentials);
+		
+		registrationService.register(email, password, MailManager.getProperty("mail.user.name"),
+				MailManager.getProperty("mail.user.id"), MailManager.getProperty("mail.user.password"), messageSubject,
+				messageText);
+		String resp = MessageManager.getProperty("message.registration.success") + email;
 		return new ResponseInfo(resp);
 	}
 
@@ -69,7 +68,7 @@ public class RegistrationController {
 				request.getParameter(ConfigurationManager.getProperty("jwt.confirmation.second")),
 				request.getParameter(ConfigurationManager.getProperty("jwt.confirmation.third")));
 		registrationService.confirm(accountWeb.getEmail(), accountWeb.getPassword());
-		
+
 		return MessageManager.getProperty("message.activation.success");
 	}
 }

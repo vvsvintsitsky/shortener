@@ -1,4 +1,4 @@
-package wsvintsitsky.shortener.webapp.security;
+package wsvintsitsky.shortener.webapp.security.manager;
 
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;

@@ -43,8 +43,8 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account getByEmailAndPassword(String email, String password) {
-		return accountDao.getByEmailAndPassword(email, password);
+	public Account getByEmailAndPassword(String email, String password, Boolean isConfirmed) {
+		return accountDao.getByEmailAndPassword(email, password, isConfirmed);
 	}
 	
 	@Override
@@ -74,12 +74,8 @@ public class AccountServiceImpl implements AccountService {
 	public void deleteNotConfirmed() {
 		Date date = new Date();
 		date.setTime(date.getTime() - 48 * 3600 * 1000);
+		LOGGER.info("Deleting unconfirmed users...");
 		accountDao.deleteNotConfirmed(date);
-	}
-
-	@Override
-	public Account getConfirmedUser(String email, String password) {
-		return accountDao.getConfirmedUser(email, password);
 	}
 
 }

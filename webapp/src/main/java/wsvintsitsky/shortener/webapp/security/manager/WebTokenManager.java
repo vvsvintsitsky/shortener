@@ -1,4 +1,4 @@
-package wsvintsitsky.shortener.webapp.security;
+package wsvintsitsky.shortener.webapp.security.manager;
 
 import java.security.Key;
 import java.util.Date;

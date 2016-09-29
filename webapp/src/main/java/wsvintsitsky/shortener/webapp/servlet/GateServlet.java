@@ -13,7 +13,7 @@ import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.service.MailSendingService;
 import wsvintsitsky.shortener.webapp.resource.MailManager;
 import wsvintsitsky.shortener.webapp.resource.MessageManager;
-import wsvintsitsky.shortener.webapp.security.ConfirmationStringManager;
+import wsvintsitsky.shortener.webapp.security.manager.ConfirmationStringManager;
 
 @SuppressWarnings("serial")
 public class GateServlet extends DispatcherServlet {

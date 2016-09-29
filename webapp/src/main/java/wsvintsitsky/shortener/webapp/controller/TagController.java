@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.TagService;
+import wsvintsitsky.shortener.webapp.datamodel.TagWeb;
 import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
+import wsvintsitsky.shortener.webapp.security.validator.TagValidator;
 
 @RestController
 @RequestMapping(value = "/tag")
@@ -34,9 +37,11 @@ public class TagController {
 	
 	@RequestMapping(value = "/{tagDescription}", method = RequestMethod.GET)
 	public Tag getTagWithUrls(@PathVariable String tagDescription) throws IOException {
+		TagWeb tagWeb = new TagWeb(null, tagDescription, null);
+		TagValidator.getInstance().validate(tagWeb);
 		Tag tag = tagService.getTagWithUrls(tagDescription);
 		if(tag == null) {
-			throw new EntityNotFoundException("No such tag found");
+			throw new EntityNotFoundException(MessageManager.getProperty("error.tag.notfound"));
 		}
 		for (Url url : tag.getUrls()) {
 			url.setTags(null);

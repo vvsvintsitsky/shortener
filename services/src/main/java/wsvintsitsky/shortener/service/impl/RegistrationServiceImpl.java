@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.AccountDao;
@@ -21,6 +23,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Inject
 	private MailSendingService mailSendingService;
 	
+	private Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+	
 	@Override
 	@Transactional
 	public void register(String email, String password, String mailFrom, String mailUserId, String mailPassword, String messageSubject, String messageText) {
@@ -31,19 +35,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 		account.setIsConfirmed(false);
 		account.setIsNotified(false);
 		accountDao.insert(account);
+		LOGGER.info("New user created: " + account.toString());
 		mailSendingService.sendRegisteredEmail(account, mailFrom, mailUserId, mailPassword, messageSubject, messageText);
 	}
 
 	@Override
 	@Transactional
 	public boolean confirm(String email, String password) {
-		Account account = accountDao.getByEmailAndPassword(email, password);
-		if(account == null) {
-			return false;
-		}
-		account.setIsConfirmed(true);
-		accountDao.update(account);
-		return true;
+		return accountDao.confirmUser(email, password) != 0;
 	}
 
 }

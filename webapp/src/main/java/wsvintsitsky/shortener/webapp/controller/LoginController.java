@@ -19,7 +19,9 @@ import wsvintsitsky.shortener.webapp.exception.BadRequestException;
 import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
-import wsvintsitsky.shortener.webapp.security.WebTokenManager;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
+import wsvintsitsky.shortener.webapp.security.manager.WebTokenManager;
+import wsvintsitsky.shortener.webapp.security.validator.AccountValidator;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -44,12 +46,10 @@ public class LoginController {
 	public void login(HttpServletResponse response, @RequestBody AccountWeb incomingAccount) throws IOException {
 		String login = incomingAccount.getEmail();
 		String password = incomingAccount.getPassword();
-		if(login == null || password == null) {
-			throw new BadRequestException("Incorrect login or password");
-		}
-		Account account = accountService.getConfirmedUser(login, password);
+		AccountValidator.getInstance().validate(incomingAccount);
+		Account account = accountService.getByEmailAndPassword(login, password, true);
 		if(account == null) {
-			throw new EntityNotFoundException("Incorrect login or password");
+			throw new EntityNotFoundException(MessageManager.getProperty("error.account.notfound"));
 		}
 		String jwt = WebTokenManager.createJWT(account.getEmail(), account.getPassword());
 		String jwtName = ConfigurationManager.getProperty("jwt.name");

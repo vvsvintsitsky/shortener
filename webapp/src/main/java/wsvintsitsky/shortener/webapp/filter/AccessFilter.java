@@ -18,7 +18,7 @@ import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
-import wsvintsitsky.shortener.webapp.security.WebTokenManager;
+import wsvintsitsky.shortener.webapp.security.manager.WebTokenManager;
 
 public class AccessFilter implements Filter {
 
@@ -44,7 +44,7 @@ public class AccessFilter implements Filter {
 		AccountWeb accountWeb = WebTokenManager.parseJWT(jwt);
 		
 		if (accountWeb != null) {
-			Account account = accountService.getConfirmedUser(accountWeb.getEmail(), accountWeb.getPassword());
+			Account account = accountService.getByEmailAndPassword(accountWeb.getEmail(), accountWeb.getPassword(), true);
 			httpRequest.setAttribute("accountId", account.getId());
 			chain.doFilter(httpRequest, httpResponse);
 			return;

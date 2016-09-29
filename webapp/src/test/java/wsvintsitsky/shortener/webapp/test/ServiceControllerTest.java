@@ -33,6 +33,7 @@ import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 import wsvintsitsky.shortener.webapp.datamodel.TagWeb;
 import wsvintsitsky.shortener.webapp.datamodel.UrlWeb;
+import wsvintsitsky.shortener.webapp.resource.MessageManager;
 import wsvintsitsky.shortener.webapp.test.database.filler.DatabaseFiller;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -133,20 +134,21 @@ public class ServiceControllerTest {
 		byte jsonObject[] = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Url description cannot be empty")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty"))));
 		
 		urlWeb.setDescription("urlWebDescription");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Url must contain at least 1 tag")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.longurl.incorrect"))));
 		
 		webTags.add(tagWeb);
-		urlWeb.setTags(webTags); 
+		urlWeb.setTags(webTags);
+		urlWeb.setLongUrl("localhost");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(put(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Tag description cannot be empty")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty"))));
 		
 		tagWeb.setDescription("tagWebDescr");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);
@@ -168,20 +170,21 @@ public class ServiceControllerTest {
 		byte jsonObject[] = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Url description cannot be empty")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.description.empty"))));
 		
 		urlWeb.setDescription("urlWebDescription");
+		urlWeb.setLongUrl("localhost");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Url must contain at least 1 tag")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.url.tags.empty"))));
 		
 		webTags.add(tagWeb);
 		urlWeb.setTags(webTags); 
 		jsonObject = mapper.writeValueAsBytes(urlWeb);		
 		mockMvc.perform(post(requestString).requestAttr("accountId", account.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 		.andExpect(status().isBadRequest())
-		.andExpect(jsonPath("$.ex", is("Tag description cannot be empty")));
+		.andExpect(jsonPath("$.ex", is(MessageManager.getProperty("error.tag.description.empty"))));
 		
 		tagWeb.setDescription("tagWebDescr");
 		jsonObject = mapper.writeValueAsBytes(urlWeb);
