@@ -103,12 +103,12 @@ public class ServiceControllerTest {
 
 	@Test
 	public void testGetAccountsUrls() throws Exception {
-		String requestString = "/service";
+		String requestString = "/service/urls/page/0";
 		List<Account> accounts = accountService.getAll();
 		List<Url> urls;
 		
 		for (Account account : accounts) {
-			urls = urlService.getUrlsByAccountId(account.getId());
+			urls = urlService.getUrlsByAccountId(account.getId(), 0);
 			mockMvc.perform(get(requestString).requestAttr("accountId", account.getId())).andExpect(status().isOk())
 					.andExpect(jsonPath("$[0].id", is(urls.get(0).getId().intValue())))
 					.andExpect(jsonPath("$[0].visited", is(urls.get(0).getVisited().intValue())))
@@ -124,7 +124,7 @@ public class ServiceControllerTest {
 		String requestString = "/service";
 		Account account = accountService.getAll().get(0);
 		Locale locale = Locale.getDefault();
-		Url url = urlService.getUrlsByAccountId(account.getId()).get(0);
+		Url url = urlService.getUrlsByAccountId(account.getId() ,0).get(0);
 		List<TagWeb> webTags = new ArrayList<TagWeb>();
 		TagWeb tagWeb = new TagWeb();
 		UrlWeb urlWeb = new UrlWeb();

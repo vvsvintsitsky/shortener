@@ -14,6 +14,7 @@ angular.
 			
 			service.servicePath =  rootPath + "service/";
 			service.infoPath = rootPath + "info/";
+			service.accountUrlsPath = service.servicePath + "urls/page/";
 			
 			service.getInfo = function(shortUrl) {
 				var result =
@@ -25,13 +26,16 @@ angular.
 				return result;
 			}
 			
-			service.getUsersUrls = function() {
+			service.getUsersUrls = function(page) {
 				var token = $cookies.get('Authentication');
 				var header = {
 					'Authentication' :  token
 				};
+				if(page == undefined) {
+					page = 0;
+				}
 				var result =
-					$http.get(service.servicePath, {
+					$http.get(service.accountUrlsPath + page, {
 						headers : header
 					}).then(function successCallback(response) {
 						return response.data;

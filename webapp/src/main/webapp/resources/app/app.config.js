@@ -7,7 +7,7 @@ mainApp.config(
 						template : '<login-panel></login-panel>'
 					}).
 
-					when('/viewUrls', {
+					when('/viewUrls/:page', {
 						template : '<view-urls></view-urls>'
 					}).
 

@@ -10,7 +10,7 @@ public interface UrlDao extends AbstractDao<Url, Long> {
 	
 	Url getUrlWithTags(String shortUrl);
 	
-	List<Url> getUrlsByAccountId(Long accountId);
+	List<Url> getUrlsByAccountId(Long accountId, Integer page);
 	
 	Url checkOwnership(Long accountId, String shortUrl);
 }

@@ -103,8 +103,11 @@ public class UrlServiceImpl implements UrlService {
 	}
 
 	@Override
-	public List<Url> getUrlsByAccountId(Long accountId) {
-		return urlDao.getUrlsByAccountId(accountId);
+	public List<Url> getUrlsByAccountId(Long accountId, Integer page) {
+		if(page == null) {
+			page = 0;
+		}
+		return urlDao.getUrlsByAccountId(accountId, page);
 	}
 
 	@Override

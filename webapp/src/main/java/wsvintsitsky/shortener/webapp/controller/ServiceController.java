@@ -48,10 +48,10 @@ public class ServiceController {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
 	
-	@RequestMapping(method = RequestMethod.GET)
-	public List<Url> getAccountsUrls(HttpServletRequest request) {
+	@RequestMapping(value = "urls/page/{page}", method = RequestMethod.GET)
+	public List<Url> getAccountsUrls(HttpServletRequest request, @PathVariable Integer page) {
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<Url> urls = urlService.getUrlsByAccountId(accountId);
+		List<Url> urls = urlService.getUrlsByAccountId(accountId, page);
 		for (Url url : urls) {
 			url.setAccount(null);
 			url.setTags(null);

@@ -90,7 +90,7 @@ describe("core.url", function() {
 			'Authentication' : $cookies.get(authHeaderName),
 			'Accept' : 'application/json, text/plain, */*'
 		};
-		$httpBackend.expectGET(urlService.servicePath, headers).respond(200,
+		$httpBackend.expectGET(urlService.accountUrlsPath, headers).respond(200,
 				responseUrls);
 		urlService.getUsersUrls().then(function(returnFromPromise) {
 			result = returnFromPromise;

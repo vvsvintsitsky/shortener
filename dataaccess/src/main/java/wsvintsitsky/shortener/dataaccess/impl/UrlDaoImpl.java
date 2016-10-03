@@ -68,16 +68,20 @@ public class UrlDaoImpl extends AbstractDaoImpl<Url, Long> implements UrlDao {
 	}
 
 	@Override
-	public List<Url> getUrlsByAccountId(Long accountId) {
+	public List<Url> getUrlsByAccountId(Long accountId, Integer page) {
+		int offset = 10;
 		EntityManager em = getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Url> cq = cb.createQuery(Url.class);
 		Root<Url> from = cq.from(Url.class);
 
 		Predicate accountIdCondition = cb.equal(from.get(Url_.account).get(Account_.id), accountId);
+		
 		cq.where(accountIdCondition);
-
+		
 		TypedQuery<Url> q = em.createQuery(cq);
+		q.setFirstResult(page * offset);
+		q.setMaxResults(offset);
 		return q.getResultList();
 	}
 
