@@ -1,5 +1,6 @@
 package wsvintsitsky.shortener.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -98,7 +99,7 @@ public class UrlServiceTest {
 		Url url = urlService.getAll().get(0);
 
 		try {
-			urlService.delete(url.getId());
+			urlService.delete(url);
 		} catch (PersistenceException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
@@ -134,6 +135,28 @@ public class UrlServiceTest {
 		}
 	}
 
+	@Test
+	public void testUpdateUrlsTags() {
+		Url url = urls.get(0);
+		url.getTags().remove(0);
+
+		List<String> tagDescriptions = new ArrayList<String>();
+		for(Tag tag : url.getTags()) {
+			tagDescriptions.add(tag.getDescription());
+		}
+		Tag tag = new Tag();
+		tag.setDescription("aaa");
+		tagDescriptions.add(tag.getDescription());
+		url.getTags().add(tag);
+		urlService.updateUrlsTags(url.getAccount().getId(), url.getShortUrl(), tagDescriptions);
+		Url url2 = urlService.getUrlWithTags(url.getShortUrl());
+		
+		for(int i = 0; i < url.getTags().size(); i++) {
+			if(!url.getTags().get(i).getDescription().equals(url2.getTags().get(i).getDescription()))
+			logAndThrowExcetion("Tags weren't updated corretly");
+		}
+	}
+	
 	private void logAndThrowExcetion(String message) {
 		LOGGER.error(message);
 		throw new IllegalStateException(message);

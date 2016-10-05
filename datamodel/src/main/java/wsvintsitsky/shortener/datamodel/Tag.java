@@ -40,7 +40,7 @@ public class Tag extends AbstractModel {
 
 	@Override
 	public String toString() {
-		return "Tag [id=" + getId() + ", description=" + description + "]";
+		return "Tag [description=" + description + ", urls=" + urls + "]";
 	}
 
 	@Override

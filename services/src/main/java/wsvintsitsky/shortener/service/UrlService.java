@@ -12,7 +12,7 @@ public interface UrlService {
 
 	List<Url> getAll();
 
-	void delete(Long id);
+	void delete(Url url);
 
 	void deleteAll();
 

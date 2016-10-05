@@ -1,6 +1,6 @@
 package wsvintsitsky.shortener.service.impl;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,11 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import wsvintsitsky.shortener.dataaccess.AccountDao;
-import wsvintsitsky.shortener.dataaccess.TagDao;
+import wsvintsitsky.shortener.dataaccess.Url2TagDao;
 import wsvintsitsky.shortener.dataaccess.UrlDao;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
+import wsvintsitsky.shortener.service.StringEncodingService;
+import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 
 @Service
@@ -25,25 +27,54 @@ public class UrlServiceImpl implements UrlService {
 	private UrlDao urlDao;
 	
 	@Inject
-	private TagDao tagDao;
+	private TagService tagService;
 	
 	@Inject
 	private AccountDao accountDao;
+
+	@Inject
+	private Url2TagDao url2TagDao;
+	
+	@Inject
+	private StringEncodingService stringEncodingService;
 	
 	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceImpl.class);
-	
-	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
 	@Override
 	@Transactional
 	public void saveOrUpdate(Url url) {
 		if (url.getId() == null) {
-			url.setShortUrl(shortenUrl(url.getLongUrl()));
-			url.setVisited(0L);
+			url.setShortUrl(stringEncodingService.encodeString(url.getLongUrl()));
 			urlDao.insert(url);
 		} else {
 			urlDao.update(url);
+			updateUrl2Tag(url);
 		}
+	}
+	
+	private void updateUrl2Tag(Url url) {
+		List<Long> exUrl2Tags = url2TagDao.getMatchingUrls2Tags(url);
+		List<Long> insUrl2Tags = new ArrayList<Long>();
+		if(url.getTags() != null) {
+			setUrl2TagsForDeleteAndInsert(url, exUrl2Tags, insUrl2Tags);
+			if(exUrl2Tags.size() != 0) {
+				url2TagDao.deleteUrl2Tags(url, exUrl2Tags);
+			}
+			if(insUrl2Tags.size() != 0) {
+				url2TagDao.insertUrl2Tags(url, insUrl2Tags);
+			}
+		}
+	}
+
+	private void setUrl2TagsForDeleteAndInsert(Url url, List<Long> exUrl2Tags, List<Long> insUrl2Tags) {
+		for (Tag tag : url.getTags()) {
+			if (exUrl2Tags.contains(tag.getId())) {
+				exUrl2Tags.remove(tag.getId());
+			} else {
+				insUrl2Tags.add(tag.getId());
+			}
+		}
+//		System.out.println(exUrl2Tags);
 	}
 
 	@Override
@@ -58,29 +89,18 @@ public class UrlServiceImpl implements UrlService {
 
 	@Override
 	@Transactional
-	public void delete(Long id) {
-		urlDao.delete(id);
+	public void delete(Url url) {
+		url2TagDao.deleteUrl2Tags(url);
+		urlDao.delete(url.getId());
 	}
 
 	@Override
 	@Transactional
 	public void deleteAll() {
+		url2TagDao.deleteAll();
 		urlDao.deleteAll();
 	}
 	
-	private String shortenUrl(String longUrl) {
-		double id1 = (double)(longUrl.hashCode() + (double)(new Date().hashCode()) +  (double)3*2147483647);
-		int z;
-		StringBuilder sb = new StringBuilder();
-		while(id1 > 0) {
-			z = (int) (id1%62);
-			char ch = CHARS.charAt(z);
-			sb.append(ch);
-			id1 = (id1 - z)/62;
-		}
-		return sb.toString();
-	}
-
 	@Override
 	public Url getUrlWithTags(String shortUrl) {
 		return urlDao.getUrlWithTags(shortUrl);
@@ -107,7 +127,8 @@ public class UrlServiceImpl implements UrlService {
 		if(page == null) {
 			page = 0;
 		}
-		return urlDao.getUrlsByAccountId(accountId, page);
+		int limit = 10;
+		return urlDao.getUrlsByAccountId(accountId, limit, page * limit);
 	}
 
 	@Override
@@ -122,39 +143,41 @@ public class UrlServiceImpl implements UrlService {
 		if(url == null) {
 			return null;
 		}
-		List<Tag> existingTags = tagDao.getExistingTags(tagDescriptions);
-		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
-		insertNewTags(tagDescriptions, existingTags);
-		url.setTags(existingTags);
+		List<Tag> upToDateTags = getUpToDateTags(tagDescriptions);
+		url.setTags(upToDateTags);
+		url = urlDao.update(url);
 		LOGGER.info(String.format("Url(%s) has been updated: %s", url.getId(), url));
-		return urlDao.update(url);
+		updateUrl2Tag(url);
+		return url;
 	}
 	
 	@Override
 	@Transactional
 	public Url createUrl(Long accountId, String longUrl, String description, List<String> tagDescriptions) {
-		Url url = new Url();
 		Account account = accountDao.get(accountId);
-		url.setAccount(account);
-		List<Tag> existingTags = tagDao.getExistingTags(tagDescriptions);
-		removeExistingTagsFromDescriptions(tagDescriptions, existingTags);
-		insertNewTags(tagDescriptions, existingTags);
-		url.setTags(existingTags);
-		url.setLongUrl(longUrl);
-		url.setDescription(description);
-		url.setShortUrl(shortenUrl(url.getLongUrl()));
-		url.setVisited(0L);
+		Url url;
+		String encodedUrl = stringEncodingService.encodeString(longUrl);
+		List<Tag> upToDateTags = getUpToDateTags(tagDescriptions);
+		url = new Url(encodedUrl, longUrl, 0L, description, account, upToDateTags);
 		url = urlDao.insert(url);
+		url2TagDao.insertUrl2Tags(url);
 		LOGGER.info(String.format("User%s created new url: %s", account.getId(), url));
 		return url;
 	}
 
+	private List<Tag> getUpToDateTags(List<String> tagDescriptions) {
+		List<Tag> upToDateTags = tagService.getExistingTags(tagDescriptions);
+		removeExistingTagsFromDescriptions(tagDescriptions, upToDateTags);
+		insertNewTags(tagDescriptions, upToDateTags);
+		return upToDateTags;
+	}
+	
 	private void insertNewTags(List<String> tagDescriptions, List<Tag> existingTags) {
 		Tag tag;
 		for (String tagDescription : tagDescriptions) {
 			tag = new Tag();
 			tag.setDescription(tagDescription);
-			tagDao.insert(tag);
+			tagService.saveOrUpdate(tag);
 			existingTags.add(tag);
 		}
 	}

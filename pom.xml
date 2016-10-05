@@ -17,6 +17,7 @@
 		<module>dataaccess</module>
 		<module>services</module>
 		<module>webapp</module>
+		<module>authentication</module>
 	</modules>
 
 	<dependencyManagement>
@@ -42,7 +43,11 @@
 				<artifactId>shortener-webapp</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-
+			<dependency>
+				<groupId>wsvintsitsky.shortener</groupId>
+				<artifactId>shortener-authentication</artifactId>
+				<version>1.0.0</version>
+			</dependency>
 
 
 			<dependency>

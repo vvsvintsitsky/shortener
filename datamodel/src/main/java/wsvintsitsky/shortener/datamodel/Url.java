@@ -36,6 +36,23 @@ public class Url extends AbstractModel{
 	@ManyToMany(targetEntity = Tag.class)
 	private List<Tag> tags = new ArrayList<Tag>();
 
+	public Url() {
+		this.shortUrl = null;
+		this.longUrl = null;
+		this.visited = null;
+		this.description = null;
+		this.account = null;
+	}
+	
+	public Url(String shortUrl, String longUrl, Long visited, String description, Account account, List<Tag> tags) {
+		this.shortUrl = shortUrl;
+		this.longUrl = longUrl;
+		this.visited = visited;
+		this.description = description;
+		this.account = account;
+		this.tags = tags;
+	}
+	
 	public String getShortUrl() {
 		return shortUrl;
 	}
@@ -86,12 +103,8 @@ public class Url extends AbstractModel{
 
 	@Override
 	public String toString() {
-		String url = "Url [id=" + getId() + ", shortUrl=" + shortUrl + ", longUrl=" + longUrl + ", visited=" + visited + ", description="
-				+ description;
-		if(this.tags != null) {
-			url = url + ", tags: " + this.tags ;
-		}
-		return url + "]";
+		return "Url [shortUrl=" + shortUrl + ", longUrl=" + longUrl + ", visited=" + visited + ", description="
+				+ description + ", account=" + account + ", tags=" + tags + "]";
 	}
 
 	@Override

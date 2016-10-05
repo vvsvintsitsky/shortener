@@ -109,7 +109,7 @@ public class TagServiceTest {
 		Tag tag = tagService.getAll().get(0);
 		
 		try {
-			tagService.delete(tag.getId());
+			tagService.delete(tag);
 		} catch (PersistenceException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
@@ -131,10 +131,17 @@ public class TagServiceTest {
 			url.setAccount(null);
 			url.setTags(null);
 		}
-		boolean condition = tag1.getUrls().containsAll(tag2.getUrls()) && tag2.getUrls().containsAll(tag1.getUrls());
-		if(!condition) {
-			logAndThrowExcetion("Tag wasn't deleted");
+		
+		if(tag1.getUrls().size() == tag2.getUrls().size()) {
+			for(int i = 0; i < tag1.getUrls().size(); i++) {
+				tag2.getUrls().get(i).setAccount(null);
+				if(!tag1.getUrls().get(i).equals(tag2.getUrls().get(i))) {
+					logAndThrowExcetion("Not equal url found!");
+				}
+			}
+			return;
 		}
+		logAndThrowExcetion("Wrong urls array size!");
 	}
 	
 	private void logAndThrowExcetion(String message) {

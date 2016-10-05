@@ -11,8 +11,10 @@ public interface TagService {
 	Tag get(Long id);
 
 	List<Tag> getAll();
+	
+	List<Tag> getExistingTags(List<String> tagDescriptions);
 
-	void delete(Long id);
+	void delete(Tag tag);
 
 	void deleteAll();
 	

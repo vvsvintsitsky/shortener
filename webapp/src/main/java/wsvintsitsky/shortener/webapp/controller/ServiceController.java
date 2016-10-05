@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,11 @@ public class ServiceController {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ErrorInfo handleEntityNotFoundException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
+	}
+	
+	@RequestMapping(value = "urls/page/", method = RequestMethod.GET)
+	public void redirect(HttpServletResponse response) throws IOException {
+		response.sendRedirect("urls/page/0");
 	}
 	
 	@RequestMapping(value = "urls/page/{page}", method = RequestMethod.GET)
