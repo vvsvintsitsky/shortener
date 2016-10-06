@@ -7,19 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
-
 import wsvintsitsky.shortener.dataaccess.Url2TagDao;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 
-@Repository
 public class Url2TagDaoImpl implements Url2TagDao {
 
 	private final static String INSERT_URL2TAG = "INSERT INTO url_2_tag (url_id, tag_id) VALUES (?, ?)";
@@ -32,10 +28,13 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	private final static String DELETE_URL2TAGSU = "DELETE FROM url_2_tag WHERE url_id = :urlId and tag_id IN (:ids)";
 	private final static String INSERT_URL2TAGSL = "INSERT INTO url_2_tag VALUES (?, ?)";
 	
+	@SuppressWarnings("unused")
+	private DataSource dataSource;
+	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-	@Autowired
-	public Url2TagDaoImpl(DataSource dataSource) {
+	
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import wsvintsitsky.shortener.datamodel.Account;
@@ -144,7 +145,7 @@ public class AccountServiceTest {
 		try {
 			accountService.delete(account.getId());
 			logAndThrowExcetion("Account with existing urls was deleted");
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			urlService.deleteAll();
 		}
 

@@ -3,13 +3,11 @@ package wsvintsitsky.shortener.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import wsvintsitsky.shortener.dataaccess.AccountDao;
 import wsvintsitsky.shortener.dataaccess.Url2TagDao;
 import wsvintsitsky.shortener.dataaccess.UrlDao;
@@ -20,22 +18,21 @@ import wsvintsitsky.shortener.service.StringEncodingService;
 import wsvintsitsky.shortener.service.TagService;
 import wsvintsitsky.shortener.service.UrlService;
 
-@Service
 public class UrlServiceImpl implements UrlService {
 
-	@Inject
+	@Autowired
 	private UrlDao urlDao;
 	
-	@Inject
+	@Autowired
 	private TagService tagService;
 	
-	@Inject
+	@Autowired
 	private AccountDao accountDao;
 
-	@Inject
+	@Autowired
 	private Url2TagDao url2TagDao;
 	
-	@Inject
+	@Autowired
 	private StringEncodingService stringEncodingService;
 	
 	private Logger LOGGER = LoggerFactory.getLogger(UrlServiceImpl.class);
@@ -74,7 +71,6 @@ public class UrlServiceImpl implements UrlService {
 				insUrl2Tags.add(tag.getId());
 			}
 		}
-//		System.out.println(exUrl2Tags);
 	}
 
 	@Override

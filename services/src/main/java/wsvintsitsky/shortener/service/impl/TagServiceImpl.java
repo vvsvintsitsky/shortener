@@ -3,24 +3,21 @@ package wsvintsitsky.shortener.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.dataaccess.Url2TagDao;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.TagService;
 
-@Service
 public class TagServiceImpl implements TagService {
 
-	@Inject
+	@Autowired
 	private TagDao tagDao;
 
-	@Inject
+	@Autowired
 	private Url2TagDao url2TagDao;
 
 	@Override

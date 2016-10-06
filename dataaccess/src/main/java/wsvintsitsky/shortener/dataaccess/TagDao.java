@@ -4,19 +4,7 @@ import java.util.List;
 
 import wsvintsitsky.shortener.datamodel.Tag;
 
-public interface TagDao{
-
-	List<Tag> getAll();
-	
-	Tag get(final Long id);
-
-    Tag insert(final Tag entity);
-
-    Tag update(Tag entity);
-
-    void delete(Long id);
-    
-    void deleteAll();
+public interface TagDao extends AbstractDao<Tag, Long>{
 	
 	Tag getTagWithUrls(String tagDescription);
 	

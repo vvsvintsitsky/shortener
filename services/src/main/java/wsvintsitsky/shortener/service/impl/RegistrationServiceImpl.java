@@ -2,25 +2,22 @@ package wsvintsitsky.shortener.service.impl;
 
 import java.util.Date;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import wsvintsitsky.shortener.dataaccess.AccountDao;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.MailSendingService;
 import wsvintsitsky.shortener.service.RegistrationService;
 
-@Service
 public class RegistrationServiceImpl implements RegistrationService {
 
-	@Inject
+	@Autowired
 	private AccountDao accountDao;
 	
-	@Inject
+	@Autowired
 	private MailSendingService mailSendingService;
 	
 	private Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);

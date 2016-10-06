@@ -4,31 +4,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-
-@Entity
 public class Account extends AbstractModel{
 
 	private static final long serialVersionUID = 1L;
 
-	@Column
 	private String email;
 	
-	@Column
 	private String password;
 
-	@Column
 	private Date created;
 	
-	@Column
 	private Boolean isNotified;
 	
-	@Column
 	private Boolean isConfirmed;
 	
-	@OneToMany(mappedBy = "account")
 	private List<Url> urls = new ArrayList<Url>();
 	
 	public String getEmail() {

@@ -3,23 +3,12 @@ package wsvintsitsky.shortener.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-
-@Entity
 public class Tag extends AbstractModel {
 
 	private static final long serialVersionUID = 1L;
 	
-	@Column
 	private String description;
 
-	@JoinTable(name = "url_2_tag", joinColumns = {
-			@JoinColumn(name = "tag_id") }, inverseJoinColumns = { @JoinColumn(name = "url_id") })
-	@ManyToMany(targetEntity = Url.class)
 	private List<Url> urls = new ArrayList<Url>();
 	
 	public String getDescription() {

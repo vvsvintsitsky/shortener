@@ -1,0 +1,17 @@
+<div class="module">
+	<div>
+		Paste your URL here: <input type="text" ng-model="$ctrl.longUrl" />
+	</div>
+	<div>
+		Enter description for URL: <input type="text"
+			ng-model="$ctrl.description" />
+	</div>
+	<div>
+		Tags: <span class="tag" ng-repeat="tag in $ctrl.tags">{{tag.description}}
+			<span ng-click="$ctrl.removeTag(tag)"> x </span>
+		</span><br> Add tags: <input type="text" ng-model="tgDscrptn" />
+		<button type="button" ng-click="$ctrl.addTag(tgDscrptn)">Add
+			Tag</button>
+		<br>
+		<button type="button" ng-click="$ctrl.createUrl()">Create URL</button>
+	</div>

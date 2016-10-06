@@ -157,6 +157,12 @@ public class UrlServiceTest {
 		}
 	}
 	
+	@Test
+	public void testCheckOwnership() {
+		Url url = urls.get(0);
+		System.out.print(urlService.checkOwnership(url.getAccount().getId(), url.getShortUrl()));
+	}
+	
 	private void logAndThrowExcetion(String message) {
 		LOGGER.error(message);
 		throw new IllegalStateException(message);

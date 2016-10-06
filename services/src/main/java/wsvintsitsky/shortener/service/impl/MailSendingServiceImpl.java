@@ -2,7 +2,6 @@ package wsvintsitsky.shortener.service.impl;
 
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -15,16 +14,14 @@ import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
 import wsvintsitsky.shortener.service.MailSendingService;
 
-@Service
 public class MailSendingServiceImpl implements MailSendingService {
 
-	@Inject
+	@Autowired
 	private AccountService accountService;
 
 	private Logger LOGGER = LoggerFactory.getLogger(MailSendingServiceImpl.class);

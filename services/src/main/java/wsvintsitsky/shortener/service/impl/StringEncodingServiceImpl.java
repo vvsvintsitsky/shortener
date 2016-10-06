@@ -2,11 +2,8 @@ package wsvintsitsky.shortener.service.impl;
 
 import java.util.Date;
 
-import org.springframework.stereotype.Service;
-
 import wsvintsitsky.shortener.service.StringEncodingService;
 
-@Service
 public class StringEncodingServiceImpl implements StringEncodingService {
 
 	private static final String CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

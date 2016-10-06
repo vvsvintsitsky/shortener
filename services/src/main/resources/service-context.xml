@@ -14,17 +14,14 @@
 	    http://www.springframework.org/schema/task
 	    http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<context:annotation-config />
-
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="database/database.properties"/>
+		<property name="location" value="database/database.properties" />
 	</bean>
-	
+
 	<context:component-scan base-package="wsvintsitsky.shortener.service.impl" />
-	<context:component-scan base-package="wsvintsitsky.shortener.dataaccess.impl" />
-	
-	<bean id="dataSource"
+
+	<bean id="dataSource1"
 		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
 		destroy-method="close">
 
@@ -35,13 +32,13 @@
 		<property name="schema" value="${jdbc.schema}" />
 	</bean>
 
-	<bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-		p:dataSource-ref="dataSource" />
+	<import resource="bean-list.xml"/>
 
 	<tx:annotation-driven />
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
-		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 </beans>

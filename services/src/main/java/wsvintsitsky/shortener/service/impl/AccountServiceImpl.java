@@ -3,21 +3,19 @@ package wsvintsitsky.shortener.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import wsvintsitsky.shortener.dataaccess.AccountDao;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.service.AccountService;
 
-@Service
 public class AccountServiceImpl implements AccountService {
 
-	@Inject
+	@Autowired
 	private AccountDao accountDao;
 
 	private Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);

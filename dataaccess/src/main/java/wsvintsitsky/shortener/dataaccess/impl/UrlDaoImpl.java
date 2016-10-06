@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -19,14 +18,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
-
 import wsvintsitsky.shortener.dataaccess.UrlDao;
 import wsvintsitsky.shortener.datamodel.Account;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 
-@Repository
 public class UrlDaoImpl implements UrlDao {
 
 	private final static String INSERT_URL = "INSERT INTO url (short_url, long_url, visited, description, account_id) VALUES (?, ?, ?, ?, ?)";
@@ -40,10 +36,13 @@ public class UrlDaoImpl implements UrlDao {
 	private final static String DELETE_ALL_URLS = "DELETE FROM url";
 	private final static String UPDATE_URL = "UPDATE url SET short_url = ?, long_url = ?, visited = ?, description = ?, account_id = ? WHERE url.id = ?";
 	
+	@SuppressWarnings("unused")
+	private DataSource dataSource;
+	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
-	@Autowired
-	protected UrlDaoImpl(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 
@@ -66,7 +65,15 @@ public class UrlDaoImpl implements UrlDao {
 
 	@Override
 	public Url getUrlByShortUrl(String shortUrl) {
-		return getJdbcOperations().queryForObject(SELECT_URL_BY_SHORTURL, new Object[] { shortUrl }, new UrlMapper());
+		List<Url> urls = getJdbcOperations().query(SELECT_URL_BY_SHORTURL, new Object[] { shortUrl }, new UrlMapper());
+		
+		if (urls.size() == 1) {
+			return urls.get(0);
+		} else if (urls.size() == 0) {
+			return null;
+		} else {
+			throw new IllegalStateException("More than one url found");
+		}
 	}
 
 	@Override
@@ -76,7 +83,15 @@ public class UrlDaoImpl implements UrlDao {
 
 	@Override
 	public Url checkOwnership(Long accountId, String shortUrl) {
-		return getJdbcOperations().queryForObject(SELECT_URL_BY_SHORTURL_AND_ACCOUNTID, new Object[] { shortUrl, accountId }, new UrlMapper());
+		List<Url> urls = getJdbcOperations().query(SELECT_URL_BY_SHORTURL_AND_ACCOUNTID, new Object[] { shortUrl, accountId }, new UrlMapper());
+	
+		if (urls.size() == 1) {
+			return urls.get(0);
+		} else if (urls.size() == 0) {
+			return null;
+		} else {
+			throw new IllegalStateException("More than one url found");
+		}
 	}
 
 	@Override

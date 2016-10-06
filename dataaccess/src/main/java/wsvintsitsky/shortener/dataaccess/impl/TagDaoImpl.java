@@ -13,7 +13,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -23,13 +22,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
-
 import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.datamodel.Tag;
 import wsvintsitsky.shortener.datamodel.Url;
 
-@Repository
 public class TagDaoImpl implements TagDao {
 
 	private final static String INSERT_TAG = "INSERT INTO tag (description) VALUES (?)";
@@ -41,10 +37,12 @@ public class TagDaoImpl implements TagDao {
 	private final static String UPDATE_TAG = "UPDATE tag SET description = ?";
 	private final static String SELECT_TAG_WITH_URLS = "SELECT tag.id AS tag_id, tag.description AS tag_description, url.id AS url_id, url.short_url AS url_short_url, url.long_url AS url_long_url, url.description AS url_description, url.visited AS url_visited FROM tag LEFT JOIN url_2_tag on tag.id = url_2_tag.tag_id LEFT JOIN url on url_2_tag.url_id = url.id WHERE tag.description = ?";
 	
+	private DataSource dataSource;
+	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
-	@Autowired
-	public TagDaoImpl(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	

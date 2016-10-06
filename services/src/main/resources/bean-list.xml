@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<import resource="account/AccountDao.xml"/>
+	<import resource="tag/TagDao.xml"/>
+	<import resource="url/UrlDao.xml"/>
+	<import resource="url2tag/Url2TagDao.xml"/>
+
+	
+	<import resource="account/AccountService.xml"/>
+	<import resource="tag/TagService.xml"/>
+	<import resource="url/UrlService.xml"/>
+	<import resource="mail-sending/MailSendingService.xml"/>
+	<import resource="string-encoding/StringEncodingService.xml"/>
+	<import resource="registration/RegistrationService.xml"/>
+	
+</beans>
