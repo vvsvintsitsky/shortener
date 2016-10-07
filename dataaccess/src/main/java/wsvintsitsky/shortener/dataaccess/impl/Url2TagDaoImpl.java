@@ -3,6 +3,7 @@ package wsvintsitsky.shortener.dataaccess.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import javax.sql.DataSource;
@@ -24,8 +25,7 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	private final static String DELETE_ALL = "DELETE FROM url_2_tag";
 	private final static String DELETE_URL2TAGU = "DELETE FROM url_2_tag WHERE url_id = ?";
 	private final static String DELETE_URL2TAGT = "DELETE FROM url_2_tag WHERE tag_id = ?";
-	private final static String DELETE_URL2TAGST = "DELETE FROM url_2_tag WHERE tag_id = :tagId and url_id IN (:ids)";
-	private final static String DELETE_URL2TAGSU = "DELETE FROM url_2_tag WHERE url_id = :urlId and tag_id IN (:ids)";
+	private final static String DELETE_OUTDATED_URL2TAGS_BY_URL = "DELETE FROM url_2_tag WHERE url_id = :urlId and tag_id NOT IN (:ids)";
 	private final static String INSERT_URL2TAGSL = "INSERT INTO url_2_tag VALUES (?, ?)";
 	
 	@SuppressWarnings("unused")
@@ -43,7 +43,7 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	}
 
 	@Override
-	public List<Long> getMatchingUrls2Tags(Tag tag) {
+	public List<Long> getMatchingUrls2TagsByTag(Tag tag) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("ids", tag.getId());
 
@@ -51,7 +51,7 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	}
 
 	@Override
-	public List<Long> getMatchingUrls2Tags(Url url) {
+	public List<Long> getMatchingUrls2TagsByUrl(Url url) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("ids", url.getId());
 
@@ -59,7 +59,7 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	}
 
 	@Override
-	public void insertUrl2Tags(Url url) {
+	public void insertUrl2TagsByUrl(Url url) {
 		getJdbcOperations().batchUpdate(INSERT_URL2TAG, new BatchPreparedStatementSetter() {
 
 			@Override
@@ -77,58 +77,35 @@ public class Url2TagDaoImpl implements Url2TagDao {
 	}
 
 	@Override
-	public void insertUrl2Tags(Tag tag) {
-		getJdbcOperations().batchUpdate(INSERT_URL2TAG, new BatchPreparedStatementSetter() {
-
-			@Override
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				Url url = tag.getUrls().get(i);
-				ps.setLong(1, url.getId());
-				ps.setLong(2, tag.getId());
-			}
-
-			@Override
-			public int getBatchSize() {
-				return tag.getUrls().size();
-			}
-		});
-	}
-
-	@Override
 	public void deleteAll() {
 		getJdbcOperations().update(DELETE_ALL);
 	}
 	
 	@Override
-	public void deleteUrl2Tags(Url url) {
+	public void deleteUrl2TagsByUrl(Url url) {
 		getJdbcOperations().update(DELETE_URL2TAGU, new Object[] { url.getId() });
 	}
 
 	@Override
-	public void deleteUrl2Tags(Tag tag) {
+	public void deleteUrl2TagsByTag(Tag tag) {
 		getJdbcOperations().update(DELETE_URL2TAGT, new Object[] { tag.getId() });
 	}
 
 	@Override
-	public void deleteUrl2Tags(Url url, List<Long> tagIds) {
+	public void deleteOutdatedUrl2TagsByUrl(Url url) {
+		List<Long> tagIds = new ArrayList<Long>();
+		for(Tag tag : url.getTags()) {
+			tagIds.add(tag.getId());
+		}
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("urlId", url.getId());
 		parameters.addValue("ids", new HashSet<Long>(tagIds));
 
-		namedParameterJdbcTemplate.update(DELETE_URL2TAGSU, parameters);
+		namedParameterJdbcTemplate.update(DELETE_OUTDATED_URL2TAGS_BY_URL, parameters);
 	}
 
 	@Override
-	public void deleteUrl2Tags(Tag tag, List<Long> urlIds) {
-		MapSqlParameterSource parameters = new MapSqlParameterSource();
-		parameters.addValue("tagId", tag.getId());
-		parameters.addValue("ids", new HashSet<Long>(urlIds));
-
-		namedParameterJdbcTemplate.update(DELETE_URL2TAGST, parameters);
-	}
-
-	@Override
-	public void insertUrl2Tags(Url url, List<Long> tagIds) {
+	public void insertNewUrl2TagsByUrl(Url url, List<Long> tagIds) {
 		 getJdbcOperations().batchUpdate(INSERT_URL2TAGSL, new BatchPreparedStatementSetter() {
 
 				@Override
@@ -140,23 +117,6 @@ public class Url2TagDaoImpl implements Url2TagDao {
 				@Override
 				public int getBatchSize() {
 					return tagIds.size();
-				}
-			  });
-	}
-
-	@Override
-	public void insertUrl2Tags(Tag tag, List<Long> urlIds) {
-		 getJdbcOperations().batchUpdate(INSERT_URL2TAGSL, new BatchPreparedStatementSetter() {
-
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					ps.setLong(1, urlIds.get(i));
-					ps.setLong(2, tag.getId());
-				}
-
-				@Override
-				public int getBatchSize() {
-					return urlIds.size();
 				}
 			  });
 	}

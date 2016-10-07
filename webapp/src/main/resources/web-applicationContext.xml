@@ -21,6 +21,11 @@
        	http://www.springframework.org/schema/security
 		http://www.springframework.org/schema/security/spring-security.xsd">
 
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="database/database.properties" />
+	</bean>
+	
 	<import resource="service-context.xml" />
 
 	<mvc:annotation-driven />

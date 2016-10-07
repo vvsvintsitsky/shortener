@@ -26,6 +26,7 @@ import wsvintsitsky.shortener.webapp.exception.BadRequestException;
 import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
 import wsvintsitsky.shortener.webapp.info.ResponseInfo;
+import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.resource.MessageManager;
 import wsvintsitsky.shortener.webapp.security.validator.TagValidator;
 import wsvintsitsky.shortener.webapp.security.validator.UrlValidator;
@@ -56,8 +57,9 @@ public class ServiceController {
 	
 	@RequestMapping(value = "urls/page/{page}", method = RequestMethod.GET)
 	public List<Url> getAccountsUrls(HttpServletRequest request, @PathVariable Integer page) {
+		Integer pageSize = new Integer(ConfigurationManager.getProperty("page.size.url"));
 		Long accountId = (Long) request.getAttribute("accountId");
-		List<Url> urls = urlService.getUrlsByAccountId(accountId, page);
+		List<Url> urls = urlService.getUrlsByAccountId(accountId, pageSize, page);
 		for (Url url : urls) {
 			url.setAccount(null);
 			url.setTags(null);

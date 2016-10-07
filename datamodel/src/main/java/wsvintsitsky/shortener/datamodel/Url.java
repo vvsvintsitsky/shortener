@@ -86,7 +86,7 @@ public class Url extends AbstractModel{
 
 	@Override
 	public String toString() {
-		return "Url [shortUrl=" + shortUrl + ", longUrl=" + longUrl + ", visited=" + visited + ", description="
+		return "Url [Id()=" + getId() + ", shortUrl=" + shortUrl + ", longUrl=" + longUrl + ", visited=" + visited + ", description="
 				+ description + ", account=" + account + ", tags=" + tags + "]";
 	}
 

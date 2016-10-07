@@ -29,7 +29,7 @@ public class Tag extends AbstractModel {
 
 	@Override
 	public String toString() {
-		return "Tag [description=" + description + ", urls=" + urls + "]";
+		return "Tag [Id()=" + getId() + ", description=" + description + ", urls=" + urls + "]";
 	}
 
 	@Override

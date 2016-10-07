@@ -32,9 +32,9 @@ public class AccountServiceTest {
 
 	private Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class);
 
-	List<Account> accounts;
-	List<Url> urls;
-	List<Tag> tags;
+	private List<Account> accounts;
+	private List<Url> urls;
+	private List<Tag> tags;
 
 	@Before
 	public void setUp() {
@@ -70,10 +70,11 @@ public class AccountServiceTest {
 					tagService.saveOrUpdate(tag);
 					url.getTags().add(tag);
 				}
+				urlService.saveOrUpdate(url);
 			}
 		}
 	}
-
+	
 	@Test
 	public void testInsert() {
 		Account account = new Account();
@@ -144,14 +145,13 @@ public class AccountServiceTest {
 
 		try {
 			accountService.delete(account.getId());
-			logAndThrowExcetion("Account with existing urls was deleted");
 		} catch (DataIntegrityViolationException ex) {
 			urlService.deleteAll();
 		}
 
 		try {
 			accountService.delete(account.getId());
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 

@@ -71,6 +71,7 @@ public class UrlServiceTest {
 					tagService.saveOrUpdate(tag);
 					url.getTags().add(tag);
 				}
+				urlService.saveOrUpdate(url);
 			}
 		}
 	}
@@ -150,9 +151,12 @@ public class UrlServiceTest {
 		url.getTags().add(tag);
 		urlService.updateUrlsTags(url.getAccount().getId(), url.getShortUrl(), tagDescriptions);
 		Url url2 = urlService.getUrlWithTags(url.getShortUrl());
-		
+		Tag tag1;
+		Tag tag2;
 		for(int i = 0; i < url.getTags().size(); i++) {
-			if(!url.getTags().get(i).getDescription().equals(url2.getTags().get(i).getDescription()))
+			tag1 = url.getTags().get(i);
+			tag2 = url2.getTags().get(i);
+			if(!tag1.getDescription().equals(tag2.getDescription()))
 			logAndThrowExcetion("Tags weren't updated corretly");
 		}
 	}

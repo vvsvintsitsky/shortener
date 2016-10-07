@@ -1,6 +1,5 @@
 package wsvintsitsky.shortener.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -8,8 +7,8 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.dataaccess.Url2TagDao;
+import wsvintsitsky.shortener.dataaccess.UrlDao;
 import wsvintsitsky.shortener.datamodel.Tag;
-import wsvintsitsky.shortener.datamodel.Url;
 import wsvintsitsky.shortener.service.TagService;
 
 public class TagServiceImpl implements TagService {
@@ -18,6 +17,9 @@ public class TagServiceImpl implements TagService {
 	private TagDao tagDao;
 
 	@Autowired
+	private UrlDao urlDao;
+	
+	@Autowired
 	private Url2TagDao url2TagDao;
 
 	@Override
@@ -25,34 +27,8 @@ public class TagServiceImpl implements TagService {
 	public void saveOrUpdate(Tag tag) {
 		if (tag.getId() == null) {
 			tagDao.insert(tag);
-			url2TagDao.insertUrl2Tags(tag);
 		} else {
 			tagDao.update(tag);
-			updateUrl2Tag(tag);
-		}
-	}
-
-	private void updateUrl2Tag(Tag tag) {
-		List<Long> exUrl2Tags = url2TagDao.getMatchingUrls2Tags(tag);
-		List<Long> insUrl2Tags = new ArrayList<Long>();
-		if(tag.getUrls() != null) {
-			setUrl2TagsForDeleteAndInsert(tag, exUrl2Tags, insUrl2Tags);
-			if(exUrl2Tags.size() != 0) {
-				url2TagDao.deleteUrl2Tags(tag, exUrl2Tags);
-			}
-			if(insUrl2Tags.size() != 0) {
-				url2TagDao.insertUrl2Tags(tag, insUrl2Tags);
-			}
-		}
-	}
-
-	private void setUrl2TagsForDeleteAndInsert(Tag tag, List<Long> exUrl2Tags, List<Long> insUrl2Tags) {
-		for (Url url : tag.getUrls()) {
-			if (exUrl2Tags.contains(url.getId())) {
-				exUrl2Tags.remove(url.getId());
-			} else {
-				insUrl2Tags.add(url.getId());
-			}
 		}
 	}
 
@@ -69,7 +45,7 @@ public class TagServiceImpl implements TagService {
 	@Override
 	@Transactional
 	public void delete(Tag tag) {
-		url2TagDao.deleteUrl2Tags(tag);
+		url2TagDao.deleteUrl2TagsByTag(tag);
 		tagDao.delete(tag.getId());
 	}
 
@@ -82,7 +58,13 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	public Tag getTagWithUrls(String tagDescription) {
-		return tagDao.getTagWithUrls(tagDescription);
+		Tag tag = tagDao.getTagByTagDescription(tagDescription);
+		if(tag == null) {
+			return null;
+		}
+		List<Long> urlIds = url2TagDao.getMatchingUrls2TagsByTag(tag);
+		tag.setUrls(urlDao.getUrlsByIds(urlIds));
+		return tag;
 	}
 
 	@Override

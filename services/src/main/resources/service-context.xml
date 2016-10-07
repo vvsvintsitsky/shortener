@@ -14,14 +14,9 @@
 	    http://www.springframework.org/schema/task
 	    http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="database/database.properties" />
-	</bean>
-
 	<context:component-scan base-package="wsvintsitsky.shortener.service.impl" />
 
-	<bean id="dataSource1"
+	<bean id="dataSource"
 		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
 		destroy-method="close">
 
@@ -32,6 +27,7 @@
 		<property name="schema" value="${jdbc.schema}" />
 	</bean>
 
+	<import resource="datasource-list.xml"/>
 	<import resource="bean-list.xml"/>
 
 	<tx:annotation-driven />

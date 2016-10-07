@@ -7,6 +7,7 @@
 		<groupId>wsvintsitsky.shortener</groupId>
 		<artifactId>shortener-parent-project</artifactId>
 		<version>1.0.0</version>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<artifactId>shortener-dataaccess</artifactId>
@@ -14,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>wsvintsitsky.shortener</groupId>
-			<artifactId>shortener-datamodel</artifactId>
+			<artifactId>shortener-network</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

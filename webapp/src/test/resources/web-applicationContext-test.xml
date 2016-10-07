@@ -29,6 +29,49 @@
 		p:url="jdbc:postgresql://localhost:5432/shortener" p:username="postgres"
 		p:password="7muCC" p:schema="test" />
 
+	<bean id="accountDataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/shortener_account" />
+		<property name="username" value="postgres"></property>
+		<property name="password" value="7muCC" />
+		<property name="schema" value="test" />
+	</bean>
+	
+	<bean id="tagDataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/shortener_tag" />
+		<property name="username" value="postgres"></property>
+		<property name="password" value="7muCC" />
+		<property name="schema" value="test" />
+	</bean>
+	
+	<bean id="urlDataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/shortener_url" />
+		<property name="username" value="postgres"></property>
+		<property name="password" value="7muCC" />
+		<property name="schema" value="test" />
+	</bean>
+	
+	<bean id="url2tagDataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/shortener_url_2_tag" />
+		<property name="username" value="postgres"></property>
+		<property name="password" value="7muCC" />
+		<property name="schema" value="test" />
+	</bean>
 	<mvc:annotation-driven />
 	<context:component-scan base-package="wsvintsitsky.shortener.webapp.controller" />
 

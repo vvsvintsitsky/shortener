@@ -20,7 +20,7 @@ public interface UrlService {
 
 	String getLongUrlByShortUrl(String shortUrl);
 
-	List<Url> getUrlsByAccountId(Long accountId, Integer page);
+	List<Url> getUrlsByAccountId(Long accountId, Integer pageSize, Integer page);
 
 	boolean checkOwnership(Long accountId, String shortUrl);
 	

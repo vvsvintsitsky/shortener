@@ -68,10 +68,12 @@ public class Account extends AbstractModel{
 		this.urls = urls;
 	}
 
+	
+
 	@Override
 	public String toString() {
-		return "Account [email=" + email + ", password=" + password + ", created=" + created + ", isNotified="
-				+ isNotified + ", isConfirmed=" + isConfirmed + "]";
+		return "Account [Id()=" + getId() + ", email=" + email + ", password=" + password + ", created=" + created + ", isNotified="
+				+ isNotified + ", isConfirmed=" + isConfirmed + ", urls=" + urls + "]";
 	}
 
 	@Override

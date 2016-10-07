@@ -4,19 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -24,7 +19,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import wsvintsitsky.shortener.dataaccess.TagDao;
 import wsvintsitsky.shortener.datamodel.Tag;
-import wsvintsitsky.shortener.datamodel.Url;
 
 public class TagDaoImpl implements TagDao {
 
@@ -34,9 +28,11 @@ public class TagDaoImpl implements TagDao {
 	private final static String SELECT_EXISTING_TAGS = "SELECT * FROM tag WHERE tag.description IN (:dscptn)";
 	private final static String DELETE_TAG = "DELETE FROM tag WHERE id = ?";
 	private final static String DELETE_ALLTAGS = "DELETE FROM tag";
-	private final static String UPDATE_TAG = "UPDATE tag SET description = ?";
-	private final static String SELECT_TAG_WITH_URLS = "SELECT tag.id AS tag_id, tag.description AS tag_description, url.id AS url_id, url.short_url AS url_short_url, url.long_url AS url_long_url, url.description AS url_description, url.visited AS url_visited FROM tag LEFT JOIN url_2_tag on tag.id = url_2_tag.tag_id LEFT JOIN url on url_2_tag.url_id = url.id WHERE tag.description = ?";
+	private final static String UPDATE_TAG = "UPDATE tag SET description = ? WHERE tag.id = ?";
+	private final static String SELECT_TAG_BY_TAG_DESCRIPTION = "SELECT * FROM tag WHERE tag.description = ?";
+	private final static String SELECT_TAGS_BY_IDS = "SELECT * FROM tag WHERE tag.id IN (:ids)";
 	
+	@SuppressWarnings("unused")
 	private DataSource dataSource;
 	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -90,13 +86,13 @@ public class TagDaoImpl implements TagDao {
 	@Override
 	public Tag update(Tag tag) {
 		getJdbcOperations().update(UPDATE_TAG,
-				new Object[] { tag.getDescription() });
+				new Object[] { tag.getDescription(), tag.getId() });
 		return tag;
 	}
 
 	@Override
-	public Tag getTagWithUrls(String tagDescription) {
-		List<Tag> tags = (List<Tag>) getJdbcOperations().query(SELECT_TAG_WITH_URLS, new Object[] { tagDescription } , new TagWithUrlsExtractor());
+	public Tag getTagByTagDescription(String tagDescription) {
+		List<Tag> tags = (List<Tag>) getJdbcOperations().query(SELECT_TAG_BY_TAG_DESCRIPTION, new Object[] { tagDescription } , new TagMapper());
 
 		if (tags.size() == 1) {
 			return tags.get(0);
@@ -107,6 +103,14 @@ public class TagDaoImpl implements TagDao {
 		}
 	}
 
+	@Override
+	public List<Tag> getTagsByIds(List<Long> tagsIds) {
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		parameters.addValue("ids", new HashSet<Long>(tagsIds));
+
+		return namedParameterJdbcTemplate.query(SELECT_TAGS_BY_IDS, parameters, new TagMapper());
+	}
+	
 	@Override
 	public List<Tag> getExistingTags(List<String> tagDescriptions) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -132,33 +136,4 @@ public class TagDaoImpl implements TagDao {
 		}
 	}
 	
-	private class TagWithUrlsExtractor implements ResultSetExtractor<List<Tag>> {
-
-		public List<Tag> extractData(ResultSet rs) throws SQLException, DataAccessException {
-			Map<Long, Tag> map = new HashMap<Long, Tag>();
-			Tag tag = null;
-			Url url;
-			while (rs.next()) {
-				Long id = rs.getLong("tag_id");
-				tag = map.get(id);
-				if (tag == null) {
-					tag = new Tag();
-					tag.setId(id);
-					tag.setDescription(rs.getString("tag_description"));
-					map.put(id, tag);
-				}
-				id = rs.getLong("url_id");
-				if (id != 0) {
-					url = new Url();
-					url.setId(id);
-					url.setShortUrl(rs.getString("url_short_url"));
-					url.setLongUrl(rs.getString("url_long_url"));
-					url.setDescription(rs.getString("url_description"));
-					url.setVisited(rs.getLong("url_visited"));
-					tag.getUrls().add(url);
-				}
-			}
-			return new ArrayList<Tag>(map.values());
-		}
-	}
 }

@@ -1,0 +1,17 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="tagDataSource"
+		class="wsvintsitsky.shortener.datamodel.util.SchemaNameAwareBasicDataSource"
+		destroy-method="close">
+
+		<property name="driverClassName" value="${tag.jdbc.driverClassName}" />
+		<property name="url" value="${tag.jdbc.url}" />
+		<property name="username" value="${tag.jdbc.username}"></property>
+		<property name="password" value="${tag.jdbc.password}" />
+		<property name="schema" value="${tag.jdbc.schema}" />
+	</bean>
+
+</beans>

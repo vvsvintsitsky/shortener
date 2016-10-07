@@ -7,11 +7,10 @@
 		<groupId>wsvintsitsky.shortener</groupId>
 		<artifactId>shortener-parent-project</artifactId>
 		<version>1.0.0</version>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<artifactId>shortener-datamodel</artifactId>
-
-
 
 	<dependencies>
 		

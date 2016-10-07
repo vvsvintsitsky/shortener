@@ -20,5 +20,5 @@ public interface AccountService {
 	
 	List<Account> findNotNotified();
 	
-	void deleteNotConfirmed();
+	void deleteNotConfirmed(Long limit);
 }

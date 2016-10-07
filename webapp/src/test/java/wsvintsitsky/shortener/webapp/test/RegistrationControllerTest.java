@@ -55,19 +55,22 @@ public class RegistrationControllerTest {
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
+	private List<Account> accounts;
+	private List<Url> urls;
+	private List<Tag> tags;
+	
 	@Before
 	public void setUp() {
 		wipeDB();
-		fillDatabase(2);
+		fillDatabase(2, 2);
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
-	private void fillDatabase(int entityCount) {
-		int multiplier = 2;
+	private void fillDatabase(int entityCount, int multiplier) {
 		DatabaseFiller filler = new DatabaseFiller();
-		List<Account> accounts = filler.createAccounts(entityCount);
-		List<Url> urls = filler.createUrls(accounts.size() * multiplier);
-		List<Tag> tags = filler.createTags(urls.size() * multiplier);
+		accounts = filler.createAccounts(entityCount);
+		urls = filler.createUrls(accounts.size() * multiplier);
+		tags = filler.createTags(urls.size() * multiplier);
 		Account account;
 		Url url;
 		Tag tag;
@@ -89,7 +92,9 @@ public class RegistrationControllerTest {
 					tag = tags.get(n);
 					tag.getUrls().add(url);
 					tagService.saveOrUpdate(tag);
+					url.getTags().add(tag);
 				}
+				urlService.saveOrUpdate(url);
 			}
 		}
 	}

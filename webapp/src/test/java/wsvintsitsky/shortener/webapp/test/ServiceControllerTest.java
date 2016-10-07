@@ -56,19 +56,22 @@ public class ServiceControllerTest {
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
+	private List<Account> accounts;
+	private List<Url> urls;
+	private List<Tag> tags;
+	
 	@Before
 	public void setUp() {
 		wipeDB();
-		fillDatabase(2);
+		fillDatabase(2, 2);
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
-	private void fillDatabase(int entityCount) {
-		int multiplier = 2;
+	private void fillDatabase(int entityCount, int multiplier) {
 		DatabaseFiller filler = new DatabaseFiller();
-		List<Account> accounts = filler.createAccounts(entityCount);
-		List<Url> urls = filler.createUrls(accounts.size() * multiplier);
-		List<Tag> tags = filler.createTags(urls.size() * multiplier);
+		accounts = filler.createAccounts(entityCount);
+		urls = filler.createUrls(accounts.size() * multiplier);
+		tags = filler.createTags(urls.size() * multiplier);
 		Account account;
 		Url url;
 		Tag tag;
@@ -90,7 +93,9 @@ public class ServiceControllerTest {
 					tag = tags.get(n);
 					tag.getUrls().add(url);
 					tagService.saveOrUpdate(tag);
+					url.getTags().add(tag);
 				}
+				urlService.saveOrUpdate(url);
 			}
 		}
 	}
@@ -108,7 +113,7 @@ public class ServiceControllerTest {
 		List<Url> urls;
 		
 		for (Account account : accounts) {
-			urls = urlService.getUrlsByAccountId(account.getId(), 0);
+			urls = urlService.getUrlsByAccountId(account.getId(), 10, 0);
 			mockMvc.perform(get(requestString).requestAttr("accountId", account.getId())).andExpect(status().isOk())
 					.andExpect(jsonPath("$[0].id", is(urls.get(0).getId().intValue())))
 					.andExpect(jsonPath("$[0].visited", is(urls.get(0).getVisited().intValue())))
@@ -124,7 +129,7 @@ public class ServiceControllerTest {
 		String requestString = "/service";
 		Account account = accountService.getAll().get(0);
 		Locale locale = Locale.getDefault();
-		Url url = urlService.getUrlsByAccountId(account.getId() ,0).get(0);
+		Url url = urlService.getUrlsByAccountId(account.getId() , 10, 0).get(0);
 		List<TagWeb> webTags = new ArrayList<TagWeb>();
 		TagWeb tagWeb = new TagWeb();
 		UrlWeb urlWeb = new UrlWeb();

@@ -70,6 +70,7 @@ public class TagServiceTest {
 					tagService.saveOrUpdate(tag);
 					url.getTags().add(tag);
 				}
+				urlService.saveOrUpdate(url);
 			}
 		}
 	}

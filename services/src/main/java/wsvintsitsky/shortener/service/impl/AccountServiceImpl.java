@@ -69,9 +69,9 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Override
 	@Transactional
-	public void deleteNotConfirmed() {
+	public void deleteNotConfirmed(Long limit) {
 		Date date = new Date();
-		date.setTime(date.getTime() - 48 * 3600 * 1000);
+		date.setTime(date.getTime() - limit);
 		LOGGER.info("Deleting unconfirmed users...");
 		accountDao.deleteNotConfirmed(date);
 	}
