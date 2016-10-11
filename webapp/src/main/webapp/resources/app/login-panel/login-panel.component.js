@@ -18,7 +18,7 @@ angular
 													function(data) {
 														if (data === true) {
 															$location
-																	.path('/viewUrls');
+																	.path('/viewUrls/0');
 															$rootScope.$broadcast('logInEvent', null);
 														} else {
 															$scope.$broadcast('failureEvent', data);
