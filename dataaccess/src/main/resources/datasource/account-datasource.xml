@@ -12,6 +12,9 @@
 		<property name="username" value="${account.jdbc.username}"></property>
 		<property name="password" value="${account.jdbc.password}" />
 		<property name="schema" value="${account.jdbc.schema}" />
+		<property name="maxIdle" value="20" />
+		<property name="minIdle" value="5"/>
+		<property name="maxOpenPreparedStatements" value="180"/>
 	</bean>
 
 </beans>

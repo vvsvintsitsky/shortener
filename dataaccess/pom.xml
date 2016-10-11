@@ -13,10 +13,12 @@
 	<artifactId>shortener-dataaccess</artifactId>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>wsvintsitsky.shortener</groupId>
-			<artifactId>shortener-network</artifactId>
+			<artifactId>shortener-datamodel</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>

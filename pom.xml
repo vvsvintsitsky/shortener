@@ -14,7 +14,6 @@
 
 	<modules>
 		<module>datamodel</module>
-		<module>network</module>
 		<module>dataaccess</module>
 		<module>services</module>
 		<module>webapp</module>
@@ -26,11 +25,6 @@
 			<dependency>
 				<groupId>wsvintsitsky.shortener</groupId>
 				<artifactId>shortener-datamodel</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>wsvintsitsky.shortener</groupId>
-				<artifactId>shortener-network</artifactId>
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
@@ -75,12 +69,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>javax.inject</groupId>
-				<artifactId>javax.inject</artifactId>
-				<version>1</version>
-			</dependency>
-
-			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>javax.servlet-api</artifactId>
 				<version>3.1.0</version>
@@ -90,6 +78,17 @@
 				<groupId>javax.servlet</groupId>
 				<artifactId>jstl</artifactId>
 				<version>1.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.sun.faces</groupId>
+				<artifactId>jsf-api</artifactId>
+				<version>2.1.7</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.faces</groupId>
+				<artifactId>jsf-impl</artifactId>
+				<version>2.1.7</version>
 			</dependency>
 
 			<!-- Spring framework -->
