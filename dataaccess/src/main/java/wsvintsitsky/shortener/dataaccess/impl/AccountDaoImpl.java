@@ -66,6 +66,7 @@ public class AccountDaoImpl implements AccountDao {
 
 	@Override
 	public void deleteNotConfirmed(Date date) {
+		
 		getJdbcOperations().update(DELETE_NOT_CONFIRMED);
 	}
 

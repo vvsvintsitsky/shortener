@@ -32,19 +32,14 @@ mainApp.config(
 					});
 
 				} ]).run(function($rootScope, $cookies, $location) {
-	$rootScope.$on("$routeChangeStart", function(event, next, current) {
-		if ($cookies.get('Authentication') == null) {
-				if($location.url() == "/viewUrls") {
-					$location.path("/login");
-				}
-				if($location.url() == "/logout") {
-					$location.path("/login");
-				}
-		} else {
-			if($location.url() == "/login") {
-				$location.path("viewUrls");
+
+	$rootScope.$on('$locationChangeStart', function (event, next, current) {
+		var cookie = $cookies.get('Authentication');
+		if (cookie == undefined || cookie == null) {
+			$rootScope.$broadcast('logOutEvent', null);
+			if($location.url() != "/login" && $location.url() != "/register") {
+				$location.path("/login");
 			}
 		}
-		
 	});
 });

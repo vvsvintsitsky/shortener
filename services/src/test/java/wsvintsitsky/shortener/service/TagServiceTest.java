@@ -2,14 +2,13 @@ package wsvintsitsky.shortener.service;
 
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,13 +20,13 @@ import wsvintsitsky.shortener.datamodel.Url;
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class TagServiceTest {
 
-	@Inject
+	@Autowired
 	private UrlService urlService;
 	
-	@Inject
+	@Autowired
 	private AccountService accountService;
 	
-	@Inject
+	@Autowired
 	private TagService tagService;
 	
 	private Logger LOGGER = LoggerFactory.getLogger(TagServiceTest.class);
@@ -81,7 +80,7 @@ public class TagServiceTest {
 		tag.setDescription("description");
 		try {
 			tagService.saveOrUpdate(tag);
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 		
@@ -96,7 +95,7 @@ public class TagServiceTest {
 		tag.setDescription("description");
 		try {
 			tagService.saveOrUpdate(tag);
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 		
@@ -111,7 +110,7 @@ public class TagServiceTest {
 		
 		try {
 			tagService.delete(tag);
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 		

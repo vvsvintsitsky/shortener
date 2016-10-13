@@ -2,11 +2,14 @@ package wsvintsitsky.shortener.webapp.test;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
 import java.util.Locale;
+
+import javax.servlet.http.Cookie;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +115,7 @@ public class LoginControllerTest {
 		accountService.saveOrUpdate(account);
 		AccountWeb accountWeb = new AccountWeb();
 		AccountWeb returnedAccountWeb;
+		Cookie[] cookies;
 		ObjectMapper mapper = new ObjectMapper();
 		MvcResult mvcResult;
 		String jwtName = ConfigurationManager.getProperty("jwt.name");
@@ -136,9 +140,15 @@ public class LoginControllerTest {
 		jsonObject = mapper.writeValueAsBytes(accountWeb);
 		mvcResult = mockMvc.perform(post("/auth").contentType(MediaType.APPLICATION_JSON).content(jsonObject))
 				.andExpect(status().isOk()).andReturn();
-		
-		returnedAccountWeb = WebTokenManager.parseJWT(mvcResult.getResponse().getHeader(jwtName));
-		assertEquals("Returned login", accountWeb.getEmail(), returnedAccountWeb.getEmail());
-		assertEquals("Returned password", accountWeb.getPassword(), returnedAccountWeb.getPassword());
+		cookies = mvcResult.getResponse().getCookies();
+		for (Cookie cookie : cookies) {
+			if(cookie.getName() == jwtName) {
+				returnedAccountWeb = WebTokenManager.parseJWT(cookie.getValue());
+				assertEquals("Returned login", accountWeb.getEmail(), returnedAccountWeb.getEmail());
+				assertEquals("Returned password", accountWeb.getPassword(), returnedAccountWeb.getPassword());
+				return;
+			}
+		}
+		assertTrue("No returned cookie", false);
 	}
 }

@@ -20,9 +20,8 @@ import wsvintsitsky.shortener.webapp.datamodel.AccountWeb;
 import wsvintsitsky.shortener.webapp.exception.BadRequestException;
 import wsvintsitsky.shortener.webapp.exception.EntityNotFoundException;
 import wsvintsitsky.shortener.webapp.info.ErrorInfo;
-import wsvintsitsky.shortener.webapp.resource.ConfigurationManager;
 import wsvintsitsky.shortener.webapp.resource.MessageManager;
-import wsvintsitsky.shortener.webapp.security.manager.WebTokenManager;
+import wsvintsitsky.shortener.webapp.security.manager.AccessTokenGenerator;
 import wsvintsitsky.shortener.webapp.security.validator.AccountValidator;
 
 @RestController
@@ -54,8 +53,6 @@ public class LoginController {
 		if(account == null) {
 			throw new EntityNotFoundException(MessageManager.getProperty("error.account.notfound", request.getLocale()));
 		}
-		String jwt = WebTokenManager.createJWT(account.getEmail(), account.getPassword());
-		String jwtName = ConfigurationManager.getProperty("jwt.name");
-		response.setHeader(jwtName, jwt);
+		response.addCookie(AccessTokenGenerator.getInstance().generateAccessCookie(account.getEmail(), account.getPassword()));
 	}
 }

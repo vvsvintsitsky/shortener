@@ -1,11 +1,11 @@
 package wsvintsitsky.shortener.service;
 
-import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -17,16 +17,16 @@ import wsvintsitsky.shortener.service.impl.MailSendingServiceImpl;
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class MailSendingServiceTest {
 
-	@Inject
+	@Autowired
 	private UrlService urlService;
 	
-	@Inject
+	@Autowired
 	private AccountService accountService;
 	
-	@Inject
+	@Autowired
 	private TagService tagService;
 	
-	@Inject
+	@Autowired
 	private MailSendingService mailSendingService;
 	
 	private Logger LOGGER = LoggerFactory.getLogger(MailSendingServiceImpl.class);

@@ -7,7 +7,7 @@ angular
 						'$cookies',
 						function($http, $cookies) {
 							var service = {};
-							var rootPath = "http://192.168.100.3:8087/shortener-webapp-1.0.0/";
+							var rootPath = "http://localhost:8087/shortener-webapp-1.0.0/";
 							service.authPath = rootPath + "auth/";
 							service.servicePath = rootPath + "service/"
 							service.ownershipPath = service.servicePath
@@ -28,11 +28,6 @@ angular
 										.then(
 												function successCallback(
 														response) {
-													$cookies
-															.put(
-																	'Authentication',
-																	response
-																			.headers('Authentication'));
 													return true;
 												},
 												function errorCallback(response) {
@@ -42,17 +37,11 @@ angular
 							}
 
 							service.checkOwnership = function(shortUrl) {
-								var token = $cookies.get('Authentication');
-								if (token == undefined) {
+								if ($cookies.get('Authentication') == null) {
 									return false;
 								}
-								var authHeader = {
-									'Authentication' : token
-								}
 								var result = $http.get(
-										service.ownershipPath + shortUrl, {
-											headers : authHeader
-										}).then(
+										service.ownershipPath + shortUrl).then(
 										function successCallback(response) {
 											return response.data;
 										}, function errorCallback(response) {

@@ -1,10 +1,10 @@
 package wsvintsitsky.shortener.webapp.controller;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +34,7 @@ public class RegistrationController {
 		return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
 
-	@ExceptionHandler(PersistenceException.class)
+	@ExceptionHandler(DataIntegrityViolationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorInfo handlePersistenceException(HttpServletRequest req, Exception ex) {
 		return new ErrorInfo(req.getRequestURL().toString(), new Exception("Email is already in use"));

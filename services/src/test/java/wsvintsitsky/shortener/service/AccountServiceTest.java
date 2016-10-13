@@ -1,14 +1,13 @@
 package wsvintsitsky.shortener.service;
 
 import java.util.List;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,13 +20,13 @@ import wsvintsitsky.shortener.service.AccountService;
 @ContextConfiguration(locations = { "classpath:service-context-test.xml" })
 public class AccountServiceTest {
 
-	@Inject
+	@Autowired
 	private UrlService urlService;
 
-	@Inject
+	@Autowired
 	private AccountService accountService;
 
-	@Inject
+	@Autowired
 	private TagService tagService;
 
 	private Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class);
@@ -77,13 +76,14 @@ public class AccountServiceTest {
 	
 	@Test
 	public void testInsert() {
+
 		Account account = new Account();
 		account.setEmail("email");
 		account.setPassword("password");
 
 		try {
 			accountService.saveOrUpdate(account);
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 
@@ -130,7 +130,7 @@ public class AccountServiceTest {
 		account.setEmail("email");
 		try {
 			accountService.saveOrUpdate(account);
-		} catch (PersistenceException ex) {
+		} catch (DataIntegrityViolationException ex) {
 			logAndThrowExcetion(ex.getMessage());
 		}
 

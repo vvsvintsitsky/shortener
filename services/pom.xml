@@ -20,11 +20,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.glassfish.main.resources</groupId>
-			<artifactId>javamail-runtime</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 		</dependency>
